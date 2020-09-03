@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="CTF中常见隐写术套路"><meta name="keywords" content="隐写术"><meta name="author" content="V0WKeep3r,v0wldl@163.com"><meta name="copyright" content="V0WKeep3r"><title>CTF中常见隐写术套路 | V0W's Blog</title><link rel="shortcut icon" href="/favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.6.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.6.1"><link rel="dns-prefetch" href="https://cdn.staticfile.org"><link rel="dns-prefetch" href="https://cdn.bootcss.com"><link rel="dns-prefetch" href="https://creativecommons.org"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"找不到您查询的内容:${query}"}},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  }
+} </script><meta name="generator" content="Hexo 5.1.1"><link rel="alternate" href="/atom.xml" title="V0W's Blog" type="application/atom+xml">
+</head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar"><div class="toggle-sidebar-info text-center"><span data-toggle="切换文章详情">切换站点概览</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#0x00-%E5%89%8D%E8%A8%80"><span class="toc-text">0x00 前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x01-%E5%B7%A5%E5%85%B7"><span class="toc-text">0x01 工具</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-binwalk-dd-foremost%E5%91%BD%E4%BB%A4"><span class="toc-text">1.1 binwalk,dd,foremost命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-winhex-%E5%92%8C-01editor%E7%AD%89%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%B7%A5%E5%85%B7"><span class="toc-text">1.2 winhex 和 01editor等二进制工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-text"></span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-StegSolve"><span class="toc-text">1.3 StegSolve</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-steghide"><span class="toc-text">1.4 steghide</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-F5-steganography"><span class="toc-text">1.5 F5-steganography</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-6-mp3stego"><span class="toc-text">1.6 mp3stego</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-7-Audacity"><span class="toc-text">1.7 Audacity</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-8-BrainTools"><span class="toc-text">1.8 BrainTools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-9-%E7%9B%B2%E6%B0%B4%E5%8D%B0"><span class="toc-text">1.9 盲水印</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Usage"><span class="toc-text">Usage</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-10-LSB%E5%AF%86%E5%86%99%E5%B7%A5%E5%85%B7cloacked-pixel"><span class="toc-text">1.10 LSB密写工具cloacked-pixel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-11-Strings%E5%91%BD%E4%BB%A4"><span class="toc-text">1.11 Strings命令</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x02-%E5%9B%BE%E7%89%87%E9%9A%90%E5%86%99%E7%9A%84%E5%B8%B8%E8%A7%81%E6%80%9D%E8%B7%AF"><span class="toc-text">0x02 图片隐写的常见思路</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E7%AE%80%E5%8D%95%E5%A5%97%E8%B7%AF"><span class="toc-text">2.1 简单套路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E9%99%84%E5%8A%A0%E5%BC%8F%E7%9A%84%E5%9B%BE%E7%89%87%E9%9A%90%E5%86%99"><span class="toc-text">2.2 附加式的图片隐写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-%E5%9F%BA%E4%BA%8E%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84%E7%9A%84%E5%9B%BE%E7%89%87%E9%9A%90%E5%86%99"><span class="toc-text">2.3 基于文件结构的图片隐写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-%E5%9F%BA%E4%BA%8ELSB%E7%9A%84%E9%9A%90%E5%86%99"><span class="toc-text">2.4 基于LSB的隐写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E5%8F%8C%E5%9B%BE"><span class="toc-text">2.5 双图</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0x03-%E4%B8%80%E8%88%AC%E6%AD%A5%E9%AA%A4"><span class="toc-text">0x03 一般步骤</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#0xFF-%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="toc-text">0xFF 参考链接</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/Kaneki.jpg"></div><div class="author-info__name text-center">V0WKeep3r</div><div class="author-info__description text-center">Stay Hungry, Stay Foolish.</div><div class="follow-button"><a target="_blank" rel="noopener" href="https://github.com/qingchenldl">Follow Me</a></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">文章</span><span class="pull-right">56</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">标签</span><span class="pull-right">30</span></a><a class="author-info-articles__categories article-meta" href="/categories"><span class="pull-left">分类</span><span class="pull-right">11</span></a></div><hr><div class="author-info-links"><div class="author-info-links__title text-center">友链</div><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://zhuxianjin.github.io/">J0k3r</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://p0desta.com/">p0desta</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="https://daolgts.github.io/">dlgts</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://iwenhu.cn/">mengchen</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://p0sec.net/">p0</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://asa9ao.xyz/">唯湖</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://seaii-blog.com/">seaii</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://wzt.ac.cn/">WCatalpa.T</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://syf.ac.cn/">7N1ght</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://www.nicefish.top/posts/">nicefish</a><a class="author-info-links__name text-center" target="_blank" rel="noopener" href="http://flag0.com/">GetFlag</a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(/img/index.jpg)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">V0W's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right menus"><a class="site-page social-icon search"><i class="fa fa-search"></i><span> 搜索</span></a><a class="site-page" href="/">主页</a><a class="site-page" href="/archives">文章</a><a class="site-page" href="/tags">标签</a><a class="site-page" href="/categories">分类</a><a class="site-page" href="/about">关于我</a></span></div><div id="post-info"><div id="post-title">CTF中常见隐写术套路</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2018-10-22</time><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/CTF/">CTF</a><div class="post-meta-wordcount"><span>字数总计: </span><span class="word-count">1.8k</span><span class="post-meta__separator">|</span><span>阅读时长: 6 分钟</span></div></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><h1 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h1><p>最近有几场比赛，正好当做准备和复习总结，于是有了本文。本文总结了CTF竞赛中的常见的隐写术的套路和思路。本篇文章不过多的阐述隐写的原理，需要的可以百度看看。</p>
+<h1 id="0x01-工具"><a href="#0x01-工具" class="headerlink" title="0x01 工具"></a>0x01 工具</h1><h2 id="1-1-binwalk-dd-foremost命令"><a href="#1-1-binwalk-dd-foremost命令" class="headerlink" title="1.1 binwalk,dd,foremost命令"></a>1.1 binwalk,dd,foremost命令</h2><p>linux下binwalk命令常用于分析隐写文件，dd命令和<code>foremost</code>命令用于提取文件。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.freebuf.com/sectool/15266.html">binwalk详解</a></li>
+</ul>
+<p>常用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">binwalk xx.jpg			# 查看文件的隐藏信息</span><br><span class="line">binwalk -e xx.jpg   	# 自动提取隐藏文件</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jikexianfeng/p/6103500.html">dd命令详解</a></li>
+</ul>
+<p>常用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ dd if&#x3D;123456cry.jpg of&#x3D;2.zip skip&#x3D;19560 bs&#x3D;1</span><br><span class="line">### if为输入的文件 of为输出的文件  skip为开始偏移量  bs为同时设置读入&#x2F;输出的块大小为bytes个字节</span><br><span class="line">### 通常需要先利用binwalk来确定偏移量，dd命令进行手动提取</span><br><span class="line">29424+0 records in</span><br><span class="line">29424+0 records out</span><br><span class="line">29424 bytes (29 kB, 29 KiB) copied, 0.0604124 s, 487 kB&#x2F;s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xingyyn78/article/details/79303171">foremost命令参数中文说明</a></li>
+</ul>
+<p>常用命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">foremost 123456cry.jpg</span><br><span class="line">foremost 123456cry.jpg -T</span><br><span class="line"> - T 表示用时间戳命名文件（防止命名重复）</span><br><span class="line"> foremost -v -i baozou_new.jpg -o &#x2F;root&#x2F;Desktop&#x2F;xx</span><br><span class="line"> -i 输入文件 -o 输出文件-路径  -v在屏幕上显示详细信息</span><br></pre></td></tr></table></figure>
+
+<p>有时binwalk直接提取文件时，容易弄错偏移量导致文件出现问题，可以通过foremost 和dd命令进行提取。</p>
+<h2 id="1-2-winhex-和-01editor等二进制工具"><a href="#1-2-winhex-和-01editor等二进制工具" class="headerlink" title="1.2 winhex 和 01editor等二进制工具"></a>1.2 winhex 和 01editor等二进制工具</h2><p>此类为二进制工具，在自动分析工具分析不出来时，只能利用此类工具判断文件头和文件尾，从而得到相应的文件边界，然后提取出来。</p>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h2 id="1-3-StegSolve"><a href="#1-3-StegSolve" class="headerlink" title="1.3 StegSolve"></a>1.3 StegSolve</h2><p>一款基于Java 的集成型隐写解密工具，对于LSB隐写和多通道的查看非常有效，还可以和别的图片比较和运算。</p>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/181030/BGi6H6dBcl.png?imageslim" alt="mark"></p>
+<hr>
+<p>一般来说，上面几个工具就够用了，但是很多CTF如果想考脑洞的话，上述工具并不够，下面介绍一些其他隐写工具，可能不全、、、</p>
+<h2 id="1-4-steghide"><a href="#1-4-steghide" class="headerlink" title="1.4 steghide"></a>1.4 steghide</h2><p><strong>一般隐藏一些txt文本</strong></p>
+<p>官网地址：<a target="_blank" rel="noopener" href="http://steghide.sourceforge.net/documentation.php">http://steghide.sourceforge.net/documentation.php</a><br>在文件中隐藏数据</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">steghide –embed -cf &#x2F;root&#x2F;Desktop&#x2F;1111.jpg -ef &#x2F;root&#x2F;Desktop&#x2F;embeddate</span><br></pre></td></tr></table></figure>
+
+<p>检查图片中隐藏的信息</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">steghide info &#x2F;root&#x2F;Desktop&#x2F;1111.jpg</span><br><span class="line">steghide extract -sf background.jpg</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-5-F5-steganography"><a href="#1-5-F5-steganography" class="headerlink" title="1.5 F5-steganography"></a>1.5 F5-steganography</h2><p><strong>F5隐写</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;matthewgao&#x2F;F5-steganography</span><br><span class="line">cd F5-steganography</span><br><span class="line">java Extract ..&#x2F;123456.jpg -p 123456</span><br></pre></td></tr></table></figure>
+
+<p>后会生成output.txt文件，里面就有flag了</p>
+<h2 id="1-6-mp3stego"><a href="#1-6-mp3stego" class="headerlink" title="1.6 mp3stego"></a>1.6 mp3stego</h2><p>  <a target="_blank" rel="noopener" href="http://www.petitcolas.net/steganography/mp3stego/">mp3stego 下载链接</a></p>
+<p>主要用于mp3隐写,<strong>一般就是在mp3里面隐藏一段文本,需要密码</strong><br>使用非常简单</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">加密:encode -E hidden_text.txt -P pass svega.wav svega_stego.mp3</span><br><span class="line">解密：decode -X -P pass svega_stego.mp3</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="1-7-Audacity"><a href="#1-7-Audacity" class="headerlink" title="1.7 Audacity"></a>1.7 Audacity</h2><p><a target="_blank" rel="noopener" href="https://sourceforge.net/projects/audacity/">下载链接</a></p>
+<p>一般用于分析mp3或者其他音乐文件的波形。通过波形做一些转换，得到flag。</p>
+<h2 id="1-8-BrainTools"><a href="#1-8-BrainTools" class="headerlink" title="1.8 BrainTools"></a>1.8 BrainTools</h2><p>下载链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1Mo0FS_DVVXbcOgUtEQfcIg">https:pan.baidu.com/s/1Mo0FS_DVVXbcOgUtEQfclg</a>   密码：i6xb</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bftools.exe decode braincopter doge.png --output --dogeout.png</span><br><span class="line">bftools.exe run --dogeout.png</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/181030/GiD5C62eE6.png?imageslim" alt="mark"></p>
+<h2 id="1-9-盲水印"><a href="#1-9-盲水印" class="headerlink" title="1.9 盲水印"></a>1.9 盲水印</h2><p><a target="_blank" rel="noopener" href="https://github.com/chishaxie/BlindWaterMark">github上的项目</a></p>
+<h3 id="Usage"><a href="#Usage" class="headerlink" title="Usage"></a>Usage</h3><pre><code>Usage: python bwm.py &lt;cmd&gt; [arg...] [opts...]
+  cmds:
+    encode &lt;image&gt; &lt;watermark&gt; &lt;image(encoded)&gt;
+           image + watermark -&gt; image(encoded)
+    decode &lt;image&gt; &lt;image(encoded)&gt; &lt;watermark&gt;
+           image + image(encoded) -&gt; watermark
+  opts:
+    --debug,          Show debug
+    --seed &lt;int&gt;,     Manual setting random seed (default is 20160930)
+    --alpha &lt;float&gt;,  Manual setting alpha (default is 3.0)</code></pre>
+<p>需要相应的py包和依赖。</p>
+<h2 id="1-10-LSB密写工具cloacked-pixel"><a href="#1-10-LSB密写工具cloacked-pixel" class="headerlink" title="1.10 LSB密写工具cloacked-pixel"></a>1.10 LSB密写工具cloacked-pixel</h2><p><a target="_blank" rel="noopener" href="https://github.com/livz/cloacked-pixel">github项目地址</a></p>
+<p><strong>Hide</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ python lsb.py hide samples&#x2F;orig.jpg samples&#x2F;secret.zip p@$5w0rD</span><br><span class="line">[*] Input image size: 640x425 pixels.</span><br><span class="line">[*] Usable payload size: 99.61 KB.</span><br><span class="line">[+] Payload size: 74.636 KB </span><br><span class="line">[+] Encrypted payload size: 74.676 KB </span><br><span class="line">[+] samples&#x2F;secret.zip embedded successfully!</span><br></pre></td></tr></table></figure>
+
+<p><strong>Extract</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ python lsb.py extract samples&#x2F;orig.jpg-stego.png out p@$5w0rD </span><br><span class="line">[+] Image size: 640x425 pixels.</span><br><span class="line">[+] Written extracted data to out.</span><br><span class="line"></span><br><span class="line">$ file out </span><br><span class="line">out: Zip archive data, at least v1.0 to extract</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="1-11-Strings命令"><a href="#1-11-Strings命令" class="headerlink" title="1.11 Strings命令"></a>1.11 Strings命令</h2><p><strong>strings使用方法</strong></p>
+<p>strings命令在对象文件或二进制文件中查找可打印的字符串。字符串是4个或更多可打印字符的任意序列，以换行符或空字符结束。 strings命令对识别随机对象文件很有用。</p>
+<p>选项：</p>
+<ul>
+<li>-a –all：扫描整个文件而不是只扫描目标文件初始化和装载段</li>
+<li>-f –print-file-name：在显示字符串前先显示文件名</li>
+<li>-t –radix={o,d,x} ：输出字符的位置，基于八进制，十进制或者十六进制</li>
+<li>-e –encoding={s,S,b,l,B,L} ：选择字符大小和排列顺序:s = 7-bit, S = 8-bit, {b,l} = 16-bit, {B,L} = 32-bit</li>
+</ul>
+<p>Tips 我们使用strings + 文件名字的命令即可</p>
+<h1 id="0x02-图片隐写的常见思路"><a href="#0x02-图片隐写的常见思路" class="headerlink" title="0x02 图片隐写的常见思路"></a>0x02 图片隐写的常见思路</h1><h2 id="2-1-简单套路"><a href="#2-1-简单套路" class="headerlink" title="2.1 简单套路"></a>2.1 简单套路</h2><ol>
+<li>右键属性在备注等地方可能出现提示信息</li>
+<li>winhex打开或者记事本打开，在末尾或者头或者中间会有提示信息</li>
+<li>png图片可以调整图片高度和宽度，可能在边上有隐藏信息。</li>
+<li>stgesolve改变偏移量，或许也能发现一些信息哦</li>
+</ol>
+<h2 id="2-2-附加式的图片隐写"><a href="#2-2-附加式的图片隐写" class="headerlink" title="2.2 附加式的图片隐写"></a>2.2 附加式的图片隐写</h2><blockquote>
+<p>在附加式的图片隐写术中，我们通常是用某种程序或者某种方法在载体文件中直接附加上需要被隐写的目标，然后将载体文件直接传输给接受者或者发布到网站上，然后接受者者根据方法提取出被隐写的消息，这一个过程就是我们这里想提到的附加式图片隐写。</p>
+<p>而在CTF赛事中，关于这种图片隐写的大概有两种经典方式，一是直接附加字符串，二是图种的形式出现。</p>
+</blockquote>
+<p>附加字符串的形式有很多，主要利用strings就可以查看，往往会看出一些东西。</p>
+<p>还有很多的隐写本质上都是附加一段字符串：steghide、F5隐写、MP3stego、BrainTools（Brainfuck隐写）</p>
+<p>图种式的应该也是很常见的了，不多说了，利用binwalk。</p>
+<h2 id="2-3-基于文件结构的图片隐写"><a href="#2-3-基于文件结构的图片隐写" class="headerlink" title="2.3 基于文件结构的图片隐写"></a>2.3 基于文件结构的图片隐写</h2><p>这里一般都是图片文件里面隐藏着一个压缩包之类的。或者图片里面还隐藏着图片。</p>
+<p>往往需要通过binwalk和winhex查看才能看出来。</p>
+<h2 id="2-4-基于LSB的隐写"><a href="#2-4-基于LSB的隐写" class="headerlink" title="2.4 基于LSB的隐写"></a>2.4 基于LSB的隐写</h2><p>LSB原理我就不多说了。LSB隐写一般有两种：一种是在各个0通道的数据组合成为新的文件如txt，zip等等。还有一种是0通道的数据只是一段字符串，即cloacked-pixel形式。</p>
+<p>一般来说，stegsolve查看各色0通道都是类似的数据点阵，又和原图片形状不太像，往往就是LSB了。</p>
+<p><img src="https://raw.githubusercontent.com/qingchenldl/BlogImage/master/blog/181030/bF75Ag7jKL.jpg?imageslim" alt="mark"></p>
+<h2 id="2-5-双图"><a href="#2-5-双图" class="headerlink" title="2.5 双图"></a>2.5 双图</h2><p>双图一般有这么几种解法：</p>
+<ol>
+<li><p>运算，对，两张图的运算</p>
+<p>图的本质就是三维或者一维矩阵嘛，两张图的话，往往通过一些如<code>SUB(减法)</code>，<code>XOR（异或）</code>等运算，可以得到一些其他的信息。</p>
+</li>
+<li><p>盲水印</p>
+</li>
+</ol>
+<h1 id="0x03-一般步骤"><a href="#0x03-一般步骤" class="headerlink" title="0x03 一般步骤"></a>0x03 一般步骤</h1><ol>
+<li>属性，记事本，winhex看看有没有提示信息</li>
+<li>binwalk foremost看看</li>
+<li>stegsolve 各个通道看看，符合LSB就提取试试</li>
+<li>上面步骤都没发现什么信息的话，就在看看题目的提示，结合提示去找找相应的资料和隐写术</li>
+</ol>
+<h1 id="0xFF-参考链接"><a href="#0xFF-参考链接" class="headerlink" title="0xFF 参考链接"></a>0xFF 参考链接</h1><p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/1833">Misc 总结 —-隐写术之图片隐写(一）</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/1836">Misc 总结 —-隐写术之图片隐写(二）</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/1844">Misc 总结 —-隐写术之图片隐写(三）</a></p>
+<p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/1875">Misc 总结 —-隐写术之图片隐写(四）</a></p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:v0wldl@163.com">V0WKeep3r</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="/v0w.top/2018/10/22/CTF%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9A%90%E5%86%99%E6%9C%AF%E5%A5%97%E8%B7%AF/">v0w.top/2018/10/22/CTF%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9A%90%E5%86%99%E6%9C%AF%E5%A5%97%E8%B7%AF/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="v0w.top">V0W's Blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%9A%90%E5%86%99%E6%9C%AF/">隐写术</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044057.png"><div class="post-qr-code__desc">支付宝打赏</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044040.png"><div class="post-qr-code__desc">微信打赏</div></div></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2018/11/04/2018%E7%9C%81%E8%B5%9BWP/"><i class="fa fa-chevron-left">  </i><span>2018-科来杯-第七届山东省网络安全技能大赛WP</span></a></div><div class="next-post pull-right"><a href="/2018/10/18/%E6%8A%A4%E7%BD%91%E6%9D%AF%E5%90%8E%E8%AE%B0-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span>护网杯后记-学习笔记</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="vcomment"></div><script src="https://cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var notify = 'false' == true ? true : false;
+var verify = 'false' == true ? true : false;
+var GUEST_INFO = ['nick','mail','link'];
+var guest_info = 'nick,mail,link'.split(',').filter(function(item){
+  return GUEST_INFO.indexOf(item) > -1
+});
+guest_info = guest_info.length == 0 ? GUEST_INFO :guest_info;
+window.valine = new Valine({
+  el:'#vcomment',
+  notify:notify,
+  verify:verify,
+  appId:'xuqLRcah5FaInOgKRdj9JB3V-gzGzoHsz',
+  appKey:'8vMPXnFoh7Fih1g29jw4JNxl',
+  placeholder:'师傅可以留下你的评论和邮箱，V0W能够通过邮件get并回复哦～',
+  avatar:'retro',
+  guest_info:guest_info,
+  pageSize:'10',
+  lang: 'zh-cn'
+})</script></div></div><footer class="footer-bg" style="background-image: url(/img/index.jpg)"><div class="layout" id="footer"><div class="copyright">&copy;2018 - 2020 By V0WKeep3r</div><div class="framework-info"><span>驱动 - </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 - </span><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.6.1"></script><script src="/js/fancybox.js?version=1.6.1"></script><script src="/js/sidebar.js?version=1.6.1"></script><script src="/js/copy.js?version=1.6.1"></script><script src="/js/fireworks.js?version=1.6.1"></script><script src="/js/transition.js?version=1.6.1"></script><script src="/js/scroll.js?version=1.6.1"></script><script src="/js/head.js?version=1.6.1"></script><script src="/js/search/local-search.js"></script><script>if(/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
+  $('#nav').addClass('is-mobile')
+  $('footer').addClass('is-mobile')
+}</script><div class="search-dialog" id="local-search"><div class="search-dialog__title" id="local-search-title">本地搜索</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章"></div></div></div><hr><div id="local-search-results"><div id="local-hits"></div><div id="local-stats"><div class="local-search-stats__hr" id="hr"><span>由</span> <a target="_blank" rel="noopener" href="https://github.com/wzpan/hexo-generator-search" style="color:#49B1F5;">hexo-generator-search</a>
+ <span>提供支持</span></div></div></div><span class="search-close-button"><i class="fa fa-times"></i></span></div><div class="search-mask"></div></body></html>
