@@ -72,14 +72,7 @@ $(function () {
 
   // scroll to a head(anchor)
   function scrollToHead (anchor) {
-    var item
-    try {
-      item = $(anchor)
-    } catch (e) {
-      // fix #286 support hexo v5
-      item = $(decodeURI(anchor))
-    }
-    item.velocity('stop').velocity('scroll', {
+    $(anchor).velocity('stop').velocity('scroll', {
       duration: 500,
       easing: 'easeInOutQuart'
     })
@@ -102,9 +95,7 @@ $(function () {
     var contentMath = (docHeight > winHeight) ? (docHeight - winHeight) : ($(document).height() - winHeight)
     var scrollPercent = (currentTop) / (contentMath)
     var scrollPercentRounded = Math.round(scrollPercent * 100)
-    var percentage = (scrollPercentRounded > 100) ? 100
-      : (scrollPercentRounded <= 0) ? 0
-        : scrollPercentRounded
+    var percentage = (scrollPercentRounded > 100) ? 100 : scrollPercentRounded
     $('.progress-num').text(percentage)
     $('.sidebar-toc__progress-bar').velocity('stop')
       .velocity({
@@ -144,14 +135,6 @@ $(function () {
     if (currentId === '') {
       $('.toc-link').removeClass('active')
       $('.toc-child').hide()
-    }
-
-    // fix #286 since hexo v5.0.0 will
-    // encodeURI the toc-item href
-    var hexoVersion = GLOBAL_CONFIG.hexoVersion[0]
-
-    if (hexoVersion === '5') {
-      currentId = encodeURI(currentId)
     }
 
     var currentActive = $('.toc-link.active')
