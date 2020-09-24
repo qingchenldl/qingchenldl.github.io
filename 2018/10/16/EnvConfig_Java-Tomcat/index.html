@@ -49,7 +49,7 @@
 <p>下载命令：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mkdir &#x2F;usr&#x2F;local&#x2F;tomcat</span><br><span class="line">cd &#x2F;usr&#x2F;local&#x2F;tomcat</span><br><span class="line">wget http:&#x2F;&#x2F;mirrors.hust.edu.cn&#x2F;apache&#x2F;tomcat&#x2F;tomcat-7&#x2F;v7.0.91&#x2F;bin&#x2F;apache-tomcat-7.0.91.tar.gz</span><br><span class="line">tar -xzcf apache-tomcat-7.0.91.tar.gz</span><br><span class="line">mv apache-tomcat-7.0.91&#x2F; tomcat7.0		# 换个简单点的名字</span><br><span class="line">rm -rf apache-tomcat-7.0.91.tar.gz</span><br></pre></td></tr></table></figure>
 
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="2-2-设置环境变量"><a href="#2-2-设置环境变量" class="headerlink" title="2.2 设置环境变量"></a>2.2 设置环境变量</h2><p>在<code>/etc/profile</code>文件中设置环境变量</p>
+<h2 id><a href="#" class="headerlink" title></a></h2><h2 id="2-2-设置环境变量"><a href="#2-2-设置环境变量" class="headerlink" title="2.2 设置环境变量"></a>2.2 设置环境变量</h2><p>在<code>/etc/profile</code>文件中设置环境变量</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># tomcat env</span></span><br><span class="line"><span class="built_in">export</span> TOMCAT_HOME=/usr/<span class="built_in">local</span>/tomcat/tomcat7.0</span><br></pre></td></tr></table></figure>
 
 <p>在 <code>tomcat/bin</code>目录下执行<code>./startup.sh</code></p>

