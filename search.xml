@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>踩坑：谷歌Chrome浏览器默认https加载导致图片不显示&amp;如何解决</title>
+      <link href="/2020/12/29/Chrome-MixedContent/"/>
+      <url>/2020/12/29/Chrome-MixedContent/</url>
+      
+        <content type="html"><![CDATA[<h1 id="TL-DR"><a href="#TL-DR" class="headerlink" title="TL;DR"></a>TL;DR</h1><p>自Chrome83版本开始，Chrome浏览器默认阻止混合内容<code>MixContent</code>的下载加载等。（即https网站中的http协议加载的内容）最终导致很多未配置静态资源SSL证书的网站在加载图片等http内容时失败，最终导致图片加载不出来等问题。</p><p>网站管理员可以通过<strong>安装证书</strong>解决问题，用户可以通过<strong>允许浏览器加载不安全内容</strong>的设置或者<strong>更换FireFox等其他浏览器</strong>进行暂时性解决。</p><h1 id="0x01-定位问题"><a href="#0x01-定位问题" class="headerlink" title="0x01 定位问题"></a>0x01 定位问题</h1><p>有师傅私聊我，发现我的博客图片不加载，以为是图床挂了，做了个提醒，感谢师傅的提醒0rz。之后我发现这里的图片确实存在问题，但不是图床问题。</p><p>笔者是使用阿里云的OSS做图床，然后绑定了一个二级域名<code>image.v0w.top</code>，都是可以看到的信息。但是之前没有为这个域名和OSS添加SSL证书。</p><p>通过比较FireFox和Google Chrome的图片加载结果与博客文章的显示效果，不难发现，这里的图片不显示，不是图床的问题，而是Chrome浏览器的渲染问题。<br><img src="https://image.v0w.top/2020/12/16092311192486.jpg" alt="diff"></p><p>具体F12看一下控制台信息：<br><img src="https://image.v0w.top/2020/12/16092311820258.jpg" alt="ChromeConsole"><br>发现Chrome的控制台输出了问题原因是：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Mixed Content: The page at &#39;https:&#x2F;&#x2F;v0w.top&#x2F;2020&#x2F;12&#x2F;20&#x2F;HTTPsmuggling&#x2F;#2-1-4-Bad-Chunked-Transmission&#39; was loaded over HTTPS, but requested an insecure element &#39;http:&#x2F;&#x2F;image.v0w.top&#x2F;2020&#x2F;12&#x2F;httpsmuggling.jpeg&#39;. This request was automatically upgraded to HTTPS, For more information see https:&#x2F;&#x2F;blog.chromium.org&#x2F;2019&#x2F;10&#x2F;no-more-mixed-messages-about-https.html</span><br></pre></td></tr></table></figure><p>简单说就是网站用的https访问，图片确实使用http加载的。于是这里Chrome会做一件事：自动将http加载的数据升格成https进行加载，但是我们知道如果没有配置证书，使用https是没法加载图片的。于是出现了Console中一堆的红色报错<code>Failed to load resource: net::ERR_CERT_COMMON_NAME_INVALI</code>,即<code>资源加载失败，证书错误</code>。<br>于是最终导致了图片实现不了的问题。</p><p>我去查了一点资料，发现该问题是自Chrome版本81开始对混合内容进行警告⚠️，83开始阻止混合内容的加载和下载。个人认为谷歌此举属于好心办坏事了吧，https固然更安全，但是对每个资源站都配置SSL证书也是费钱费力啊==、<br>详细看参考以下内容：</p><ul><li><a href="https://bbs.huaweicloud.com/blogs/155829">华为-Chrome将逐步阻止HTTPS页面的HTTP资源下载</a></li><li><a href="https://help.salesforce.com/articleView?id=000355262&language=zh_CN&mode=1&type=1">Google 避免用户在 Google Chrome 中下载不安全的内容</a></li><li><a href="https://blog.chromium.org/2020/02/protecting-users-from-insecure.html">Chromium Blog-Protecting users from insecure downloads in Google Chrome</a></li></ul><p><strong>总之，自Chrome83版本开始，Chrome浏览器默认阻止混合内容<code>MixContent</code>的下载加载等。（即https网站中的http协议加载的内容）最终导致很多未配置静态资源SSL证书的网站在加载图片等http内容时失败，最终导致图片加载不出来等问题。</strong></p><h1 id="0x02-解决问题"><a href="#0x02-解决问题" class="headerlink" title="0x02 解决问题"></a>0x02 解决问题</h1><p>浏览器的此举让用户和网站管理员都很头疼。一方面用户可能正在访问的网站内容存在MixedContent加载不了的问题，不知如何解决；二方面，网站管理者可能因为这种配置不当流失很多的流量。</p><h2 id="2-1-用户如何解决"><a href="#2-1-用户如何解决" class="headerlink" title="2.1 用户如何解决"></a>2.1 用户如何解决</h2><p>用户在遇到一个网站加载不出资源时，如何解决？</p><ol><li><p>最简单的就是更换浏览器，好在其他浏览器暂时没有增加这个默认阻止MixContent的设置，当用户遇到图片加载不了等问题时，可以选择更换浏览器重新访问。</p></li><li><p>Chrome会将MixContent认为是不安全内容，同时Chrome在网站设置中默认时屏蔽不安全内容的，最终导致http内容加载失败。用户可以通过更改设置，允许不安全内容，当然这样也有浏览器被攻击的风险。<br> <img src="https://image.v0w.top/2020/12/16092330714296.jpg"></p><p> <img src="https://image.v0w.top/2020/12/16092330258550.jpg"><br> 此时可以发现图片可以正常加载：<br> <img src="https://image.v0w.top/2020/12/16092331245806.jpg"></p><h2 id="2-2-网站管理员如何解决"><a href="#2-2-网站管理员如何解决" class="headerlink" title="2.2 网站管理员如何解决"></a>2.2 网站管理员如何解决</h2><p>网站管理员可能还是需要申请和配置服务器的SSL证书解决问题。</p></li></ol><p>下面带来阿里云OSS证书申请签发配置。<br>流程如下：<br><strong>1、在阿里云申请签发SSL证书</strong><br><img src="https://image.v0w.top/2020/12/16092333966144.jpg" alt="workflow"><br>由于我是准备用给图床的域名即<code>image.v0w.top</code>购买一个证书，且没有其他用处，可以选择单域名的DV证书即可，是免费的。<br><img src="https://image.v0w.top/2020/12/16092335583157.jpg" alt="buy for free"><br>其他的依照提示进行即可，自动签发，签发过程很快，个人体验是大概五到十分钟，签发完成。<br>签发完成之后，我们选择后面的其他，会下载一个压缩包，其中包含两个文件<code>*.pem</code>和<code>*.key</code>,分别是SSL证书的公钥和私钥。<br><img src="https://image.v0w.top/2020/12/16092344739514.jpg"></p><p><strong>2、在OSS配置证书</strong><br>接着就是在OSS配置证书，到OSS控制台：<br>选择图床的bucket，传输管理-&gt;证书托管<br><img src="https://image.v0w.top/2020/12/16092345448997.jpg"><br>复制后把pem文本粘贴到公钥，key文本粘贴进私钥。上传即可。</p><p>大概需要15分钟生效，别忘记之后进行测试。<br><img src="https://image.v0w.top/2020/12/16092352588338.jpg" alt="test"></p><p><img src="https://image.v0w.top/2020/12/16092353639824.jpg" alt="博客的资源也加载成功了"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 环境与踩坑 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> https </tag>
+            
+            <tag> 浏览器安全 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HTTP请求走私攻击-学习笔记</title>
       <link href="/2020/12/20/HTTPsmuggling/"/>
       <url>/2020/12/20/HTTPsmuggling/</url>
